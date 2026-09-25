@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package rolefit.jobposting.v1;
+
+// Internal API of the Job Posting Service.
+// Consumed by Job Discovery Service. Other services must use this API
+// instead of querying the Job Posting MongoDB database directly.
+//
+// TODO: Finalize the Job message fields together with src/models/job.model.ts.
+// TODO: Decide whether Job Discovery Service needs more RPCs
+//       (e.g. GetResumeTemplate, BatchGetJobs, or a stream of job changes).
+service JobPostingService {
+  rpc GetJob (GetJobRequest) returns (GetJobResponse);
+  rpc ListJobs (ListJobsRequest) returns (ListJobsResponse);
+}
+
+enum JobStatus {
+  JOB_STATUS_UNSPECIFIED = 0;
+  JOB_STATUS_DRAFT = 1;
+  JOB_STATUS_PUBLISHED = 2;
+  JOB_STATUS_CLOSED = 3;
+}
+
+message Job {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  JobStatus status = 4;
+  // ISO-8601 timestamps. TODO: consider google.protobuf.Timestamp instead.
+  string created_at = 5;
+  string updated_at = 6;
+  // TODO: add remaining fields (company, location, requirements/skills, ...).
+}
+
+message GetJobRequest {
+  string job_id = 1;
+}
+
+message GetJobResponse {
+  Job job = 1;
+}
+
+message ListJobsRequest {
+  // TODO: finalize filters needed by Job Discovery Service.
+  JobStatus status = 1;
+  int32 page = 2;
+  int32 limit = 3;
+}
+
+message ListJobsResponse {
+  repeated Job jobs = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 limit = 4;
+}
