@@ -1,4 +1,4 @@
-import type { FilterQuery, SortOrder } from 'mongoose';
+import type { QueryFilter, SortOrder } from 'mongoose';
 import { JobModel } from '../models/job.model';
 import { ResumeTemplateModel } from '../models/resume-template.model';
 import type { Job, ListJobsQuery, ResumeTemplate } from '../types/job.types';
@@ -65,7 +65,7 @@ export class MongoJobRepository implements JobRepository {
   }
 
   async list(query: ListJobsQuery, opts: { draftsVisibleTo?: string }): Promise<{ items: Job[]; total: number }> {
-    const conditions: FilterQuery<JobDoc>[] = [
+    const conditions: Record<string, unknown>[] = [
       opts.draftsVisibleTo
         ? { $or: [{ status: { $ne: 'DRAFT' } }, { companyId: opts.draftsVisibleTo }] }
         : { status: { $ne: 'DRAFT' } },
@@ -76,7 +76,8 @@ export class MongoJobRepository implements JobRepository {
       const pattern = new RegExp(escapeRegex(query.query), 'i');
       conditions.push({ $or: [{ title: pattern }, { 'requirements.requiredSkills.name': pattern }] });
     }
-    const filter = { $and: conditions };
+    // Conditions are built dynamically, so the filter is typed loosely.
+    const filter: QueryFilter<any> = { $and: conditions };
     const sort: Record<string, SortOrder> = query.companyId ? { updatedAt: -1, _id: 1 } : { publishedAt: -1, _id: 1 };
 
     const [docs, total] = await Promise.all([
