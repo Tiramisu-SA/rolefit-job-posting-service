@@ -1,49 +1,25 @@
-import type {
-  CreateJobInput,
-  Job,
-  ListJobsQuery,
-  PaginatedResult,
-  ResumeTemplate,
-  UpdateJobInput,
-} from '../types/job.types';
-import { NotImplementedError } from '../utils/errors';
-// import { JobModel } from '../models/job.model';
+import type { Job, ListJobsQuery, ResumeTemplate } from '../types/job.types';
 
 /**
- * Data-access layer for jobs. The ONLY place that talks to MongoDB/Mongoose.
- * Returns plain domain objects (Job), never Mongoose documents, so upper layers
- * stay independent of the database.
- *
- * TODO: Implement every method using JobModel (see TODO.md).
+ * Data access for jobs and resume templates. Implementations are the ONLY code
+ * that talks to the database, and they return plain domain objects.
+ * JobService depends on this interface, so tests can use an in-memory fake.
  */
-export class JobRepository {
-  async create(_input: CreateJobInput): Promise<Job> {
-    // TODO: Insert a new job document and map it to a Job.
-    throw new NotImplementedError('JobRepository.create');
-  }
+export interface JobRepository {
+  create(job: Job): Promise<Job>;
+  findById(id: string): Promise<Job | null>;
+  /** Applies the patch and returns the new version, or null if the job is gone. */
+  update(id: string, patch: Partial<Omit<Job, 'id' | 'createdAt'>>): Promise<Job | null>;
+  delete(id: string): Promise<boolean>;
+  /**
+   * Filters, sorts and pages jobs. DRAFT jobs are returned only for
+   * `draftsVisibleTo` (the caller's company id).
+   * Sort: updatedAt desc when query.companyId is set, otherwise publishedAt desc.
+   */
+  list(query: ListJobsQuery, opts: { draftsVisibleTo?: string }): Promise<{ items: Job[]; total: number }>;
 
-  async findById(_jobId: string): Promise<Job | null> {
-    // TODO: Handle invalid ObjectId strings; return null when not found.
-    throw new NotImplementedError('JobRepository.findById');
-  }
-
-  async update(_jobId: string, _changes: UpdateJobInput | Partial<Job>): Promise<Job | null> {
-    // TODO: Update and return the new version of the document.
-    throw new NotImplementedError('JobRepository.update');
-  }
-
-  async list(_query: ListJobsQuery): Promise<PaginatedResult<Job>> {
-    // TODO: Apply filters, sorting and pagination.
-    throw new NotImplementedError('JobRepository.list');
-  }
-
-  async saveResumeTemplate(_jobId: string, _content: unknown): Promise<ResumeTemplate | null> {
-    // TODO: Persist the resume template according to the chosen storage design.
-    throw new NotImplementedError('JobRepository.saveResumeTemplate');
-  }
-
-  async findResumeTemplate(_jobId: string): Promise<ResumeTemplate | null> {
-    // TODO: Load the resume template for a job.
-    throw new NotImplementedError('JobRepository.findResumeTemplate');
-  }
+  /** Stores the template and deletes any earlier template of the same job. */
+  saveTemplate(template: ResumeTemplate): Promise<void>;
+  findTemplateByJobId(jobId: string, includeContent: boolean): Promise<ResumeTemplate | null>;
+  deleteTemplateByJobId(jobId: string): Promise<boolean>;
 }
