@@ -150,3 +150,17 @@ test('resume template: attach, get with and without content, delete', async () =
     await assert.rejects(call('GetResumeTemplate', { job_id: job.id }, ACME), hasCode(grpc.status.NOT_FOUND));
   });
 });
+
+test('validation errors that mention Thai text still come back as INVALID_ARGUMENT with readable details', async () => {
+  await withClient(async (call) => {
+    const input = { title: 'ครู', requirements: { required_skills: [{ name: 'ภาษาไทย' }, { name: 'ภาษาไทย' }] } };
+    await assert.rejects(call('CreateJob', { job: input }, ACME), (err: grpc.ServiceError) => {
+      assert.equal(err.code, grpc.status.INVALID_ARGUMENT);
+      const [raw] = err.metadata.get('x-validation-errors');
+      const details = JSON.parse(String(raw));
+      assert.equal(details[0].field, 'requirements.requiredSkills[1].name');
+      assert.match(details[0].message, /ภาษาไทย/);
+      return true;
+    });
+  });
+});

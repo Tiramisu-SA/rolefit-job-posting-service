@@ -17,10 +17,19 @@ const GRPC_STATUS: Record<ErrorCode, grpc.status> = {
   FORBIDDEN: grpc.status.PERMISSION_DENIED,
 };
 
+/**
+ * ASCII metadata values may only hold printable ASCII, so non-ASCII characters
+ * (e.g. Thai skill names in messages) are written as \uXXXX JSON escapes.
+ * JSON.parse on the client restores them.
+ */
+function asciiJson(value: unknown): string {
+  return JSON.stringify(value).replace(/[^\x20-\x7e]/g, (ch) => `\\u${ch.charCodeAt(0).toString(16).padStart(4, '0')}`);
+}
+
 function toGrpcError(err: unknown): Partial<grpc.ServiceError> {
   if (err instanceof AppError) {
     const metadata = new grpc.Metadata();
-    if (err instanceof ValidationError) metadata.set('x-validation-errors', JSON.stringify(err.details));
+    if (err instanceof ValidationError) metadata.set('x-validation-errors', asciiJson(err.details));
     return { code: GRPC_STATUS[err.code], details: err.message, metadata };
   }
   logger.error('Unhandled gRPC error', err);
