@@ -76,7 +76,8 @@ const jobSchema = new Schema(
     createdAt: { type: Date, required: true },
     updatedAt: { type: Date, required: true },
   },
-  { collection: 'jobs', versionKey: false },
+  // minimize: false keeps empty sub-documents (e.g. a draft's location: {}).
+  { collection: 'jobs', versionKey: false, minimize: false },
 );
 
 // A company's own list, newest change first.

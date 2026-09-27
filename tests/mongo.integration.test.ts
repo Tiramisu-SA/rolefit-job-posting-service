@@ -63,6 +63,10 @@ test('MongoJobRepository: CRUD, lifecycle, list and templates', { skip: !uri && 
     assert.equal((await service.getResumeTemplate(null, job.id, false)).content, undefined);
 
     const draft = await service.createJob(ACME, { title: 'Draft only' });
+    // Empty sub-documents must survive the round trip (Mongoose minimizes them by default).
+    const reread = await service.getJob(ACME, draft.id);
+    assert.deepEqual(reread.location, {});
+    assert.deepEqual(reread.salary, { currency: 'THB', visible: true });
     assert.equal((await service.listJobs(null, {})).total, 1);
     assert.equal((await service.listJobs(ACME, { companyId: 'co-acme' })).total, 2);
     await service.deleteJob(ACME, draft.id);

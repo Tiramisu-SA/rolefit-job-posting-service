@@ -9,7 +9,10 @@ type JobDoc = Record<string, unknown> & { _id: string };
 /** Turns a lean Mongo document into a plain Job: `_id` -> `id`, nulls -> undefined. */
 function toJob(doc: JobDoc): Job {
   const { _id, ...rest } = doc;
-  return JSON.parse(JSON.stringify({ id: _id, ...rest }), reviveDates) as Job;
+  const job = JSON.parse(JSON.stringify({ id: _id, ...rest }), reviveDates) as Job;
+  // Documents written before minimize was turned off may lack empty sub-documents.
+  job.location ??= {};
+  return job;
 }
 
 const DATE_KEYS = new Set(['createdAt', 'updatedAt', 'publishedAt', 'applicationDeadline']);
