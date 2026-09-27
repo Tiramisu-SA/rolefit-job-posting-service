@@ -14,13 +14,13 @@ async function main(): Promise<void> {
     logger.error(`Could not connect to MongoDB at ${env.mongodbUri}`, (err as Error).message);
   }
 
-  const app = createApp(jobService);
+  const app = createApp();
   const httpServer = app.listen(env.httpPort, () => {
     logger.info(`REST API listening on http://localhost:${env.httpPort}`);
   });
 
-  const grpcServer = await startGrpcServer(jobService, env.grpcHost, env.grpcPort);
-  logger.info(`gRPC server listening on ${env.grpcHost}:${env.grpcPort}`);
+  const { server: grpcServer, port: grpcPort } = await startGrpcServer(jobService, env.grpcHost, env.grpcPort);
+  logger.info(`gRPC server listening on ${env.grpcHost}:${grpcPort}`);
 
   const shutdown = async (signal: string) => {
     logger.info(`${signal} received, shutting down`);

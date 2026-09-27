@@ -1,18 +1,12 @@
 import * as grpc from '@grpc/grpc-js';
 import type { JobService } from '../services/job.service';
-import { AppError, type ErrorCode } from '../utils/errors';
+import { AppError, ValidationError, type ErrorCode } from '../utils/errors';
 import { logger } from '../utils/logger';
+import { callerFrom } from './identity';
+import { fromProtoJobInput, fromProtoStatus, toProtoJob, toProtoTemplate } from './job.mapper';
 
-// Plain TS shapes of the proto messages (proto-loader uses keepCase: true, so snake_case).
-// TODO: Optionally generate these types with `proto-loader-gen-types` instead of hand-writing them.
-interface GetJobRequest {
-  job_id: string;
-}
-interface ListJobsRequest {
-  status: string;
-  page: number;
-  limit: number;
-}
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type Msg = Record<string, any>;
 
 const GRPC_STATUS: Record<ErrorCode, grpc.status> = {
   NOT_IMPLEMENTED: grpc.status.UNIMPLEMENTED,
@@ -25,44 +19,72 @@ const GRPC_STATUS: Record<ErrorCode, grpc.status> = {
 
 function toGrpcError(err: unknown): Partial<grpc.ServiceError> {
   if (err instanceof AppError) {
-    return { code: GRPC_STATUS[err.code], details: err.message };
+    const metadata = new grpc.Metadata();
+    if (err instanceof ValidationError) metadata.set('x-validation-errors', JSON.stringify(err.details));
+    return { code: GRPC_STATUS[err.code], details: err.message, metadata };
   }
   logger.error('Unhandled gRPC error', err);
   return { code: grpc.status.INTERNAL, details: 'Internal server error' };
 }
 
+/** Wraps a handler: reads identity, runs it, maps the result or error. */
+function unary(run: (request: Msg, caller: ReturnType<typeof callerFrom>) => Promise<Msg>): grpc.handleUnaryCall<Msg, Msg> {
+  return async (call, callback) => {
+    try {
+      callback(null, await run(call.request, callerFrom(call.metadata)));
+    } catch (err) {
+      callback(toGrpcError(err));
+    }
+  };
+}
+
 /**
- * gRPC handlers for JobPostingService. Like the REST controller, these are a thin
- * transport layer on top of the SAME JobService - no business logic here.
+ * gRPC handlers for JobPostingService: a thin transport layer on top of
+ * JobService (identity, mapping, errors). No business rules here.
  */
 export function createJobPostingHandlers(jobService: JobService): grpc.UntypedServiceImplementation {
-  return {
-    GetJob: async (
-      call: grpc.ServerUnaryCall<GetJobRequest, unknown>,
-      callback: grpc.sendUnaryData<unknown>,
-    ) => {
-      try {
-        const job = await jobService.getJob(call.request.job_id);
-        // TODO: Map the domain Job to the proto Job message (status enum, timestamps, ...).
-        // TODO: Decide whether DRAFT jobs should be visible to Job Discovery Service.
-        callback(null, { job });
-      } catch (err) {
-        callback(toGrpcError(err));
-      }
-    },
+  const job = async (p: Promise<Parameters<typeof toProtoJob>[0]>) => ({ job: toProtoJob(await p) });
 
-    ListJobs: async (
-      call: grpc.ServerUnaryCall<ListJobsRequest, unknown>,
-      callback: grpc.sendUnaryData<unknown>,
-    ) => {
-      try {
-        // TODO: Map proto request (enum status, zero-valued page/limit) to ListJobsQuery.
-        const result = await jobService.listJobs({});
-        // TODO: Map domain result to ListJobsResponse.
-        callback(null, { jobs: result.items, total: result.total, page: result.page, limit: result.limit });
-      } catch (err) {
-        callback(toGrpcError(err));
-      }
-    },
+  return {
+    CreateJob: unary((req, caller) => job(jobService.createJob(caller, fromProtoJobInput(req.job)))),
+    GetJob: unary((req, caller) => job(jobService.getJob(caller, req.job_id))),
+    UpdateJob: unary((req, caller) => job(jobService.updateJob(caller, req.job_id, fromProtoJobInput(req.job)))),
+    PublishJob: unary((req, caller) => job(jobService.publishJob(caller, req.job_id))),
+    CloseJob: unary((req, caller) => job(jobService.closeJob(caller, req.job_id))),
+    ReopenJob: unary((req, caller) => job(jobService.reopenJob(caller, req.job_id))),
+
+    DeleteJob: unary(async (req, caller) => {
+      await jobService.deleteJob(caller, req.job_id);
+      return {};
+    }),
+
+    ListJobs: unary(async (req, caller) => {
+      const result = await jobService.listJobs(caller, {
+        status: fromProtoStatus(req.status),
+        companyId: req.company_id || undefined,
+        query: req.query || undefined,
+        page: req.page || undefined,
+        limit: req.limit || undefined,
+      });
+      return { jobs: result.items.map(toProtoJob), total: result.total, page: result.page, limit: result.limit };
+    }),
+
+    AttachResumeTemplate: unary(async (req, caller) => {
+      const template = await jobService.attachResumeTemplate(caller, req.job_id, {
+        fileName: req.file_name ?? '',
+        contentType: req.content_type ?? '',
+        content: Buffer.from(req.content ?? []),
+      });
+      return { template: toProtoTemplate(template) };
+    }),
+
+    GetResumeTemplate: unary(async (req, caller) => ({
+      template: toProtoTemplate(await jobService.getResumeTemplate(caller, req.job_id, Boolean(req.include_content))),
+    })),
+
+    DeleteResumeTemplate: unary(async (req, caller) => {
+      await jobService.deleteResumeTemplate(caller, req.job_id);
+      return {};
+    }),
   };
 }
