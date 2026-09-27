@@ -15,6 +15,10 @@ const jobSchema = new Schema(
   {
     title: { type: String, required: true, trim: true },
     description: { type: String, default: '' },
+    requirements: {
+      type: String,
+      default: '',
+    },
     status: {
       type: String,
       enum: Object.values(JobStatus),

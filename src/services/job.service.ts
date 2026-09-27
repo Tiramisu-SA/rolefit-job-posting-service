@@ -9,7 +9,7 @@ import type {
   ResumeTemplate,
   UpdateJobInput,
 } from '../types/job.types';
-import { NotImplementedError } from '../utils/errors';
+import { AppError, NotImplementedError } from '../utils/errors';
 
 /**
  * Business logic for job postings.
@@ -24,18 +24,28 @@ export class JobService {
     private readonly aiModelAdapter: AIModelAdapter,
   ) {}
 
-  async createJob(_input: CreateJobInput): Promise<Job> {
+  async createJob(input: CreateJobInput): Promise<Job> {
     // TODO: Validate input, set the initial status, persist via jobRepository.
     // TODO (optional): Use this.aiModelAdapter.extractJobRequirements() and decide
     //                  what happens if the AI call fails (job creation must not break).
-    throw new NotImplementedError('JobService.createJob');
+    return this.jobRepository.create(input);
   }
 
-  async updateJob(_jobId: string, _input: UpdateJobInput): Promise<Job> {
+  async updateJob(
+    jobId: string,
+    input: UpdateJobInput,
+  ): Promise<Job> {
     // TODO: Load job, throw NotFoundError if missing, enforce which fields may change
     //       in the current status, persist changes.
-    throw new NotImplementedError('JobService.updateJob');
+    const job = await this.jobRepository.update(jobId, input);
+
+    if (!job) {
+      throw new AppError('NOT_FOUND', `Job ${jobId} not found`);
+    }
+
+    return job;
   }
+
 
   async publishJob(_jobId: string): Promise<Job> {
     // TODO: Enforce publishing rules (allowed source states, required fields present).
@@ -53,15 +63,32 @@ export class JobService {
     throw new NotImplementedError('JobService.reopenJob');
   }
 
-  async getJob(_jobId: string): Promise<Job> {
+  async getJob(jobId: string): Promise<Job> {
     // TODO: Load job, throw NotFoundError if missing.
     // TODO: Decide whether callers may see DRAFT jobs (REST owner vs. gRPC discovery).
-    throw new NotImplementedError('JobService.getJob');
+    const job = await this.jobRepository.findById(jobId);
+
+    if (!job) {
+      throw new AppError('NOT_FOUND', `Job ${jobId} not found`);
+    }
+
+    return job;
   }
 
-  async listJobs(_query: ListJobsQuery): Promise<PaginatedResult<Job>> {
+
+  async deleteJob(jobId: string): Promise<void> {
+    const deleted = await this.jobRepository.delete(jobId);
+
+    if (!deleted) {
+      throw new AppError('NOT_FOUND', `Job ${jobId} not found`);
+    }
+  }
+
+  async listJobs(
+    query: ListJobsQuery,
+  ): Promise<PaginatedResult<Job>> {
     // TODO: Validate/normalize filters and pagination, delegate to repository.
-    throw new NotImplementedError('JobService.listJobs');
+    return this.jobRepository.list(query);
   }
 
   async attachResumeTemplate(_jobId: string, _input: AttachResumeTemplateInput): Promise<ResumeTemplate> {
