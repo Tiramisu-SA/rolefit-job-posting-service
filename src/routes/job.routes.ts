@@ -18,6 +18,7 @@ export function createJobRouter(jobService: JobService): Router {
   router.get('/', controller.listJobs);
   router.get('/:jobId', controller.getJob);
   router.put('/:jobId', controller.updateJob);
+  router.delete('/:jobId', controller.deleteJob);
 
   router.post('/:jobId/publish', controller.publishJob);
   router.post('/:jobId/close', controller.closeJob);

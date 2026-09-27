@@ -16,6 +16,7 @@ export interface Job {
   description: string;
   status: JobStatus;
   // TODO: company/owner, location, employment type, salary, skills, requirements, ...
+  requirements: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -24,6 +25,7 @@ export interface Job {
 export interface CreateJobInput {
   title: string;
   description: string;
+  requirements: string;
 }
 
 // TODO: Decide which fields may be changed after a job is published.
