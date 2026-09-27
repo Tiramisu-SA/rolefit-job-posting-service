@@ -39,6 +39,8 @@ npm run seed           # optional: 12 sample jobs (company co-brightline = dev r
 | `GRPC_HOST`   | `0.0.0.0`                                          | gRPC bind address                        |
 | `GRPC_PORT`   | `50052`                                            | gRPC API port                            |
 | `MONGODB_URI` | `mongodb://localhost:27017/rolefit_job_posting`    | MongoDB connection string                |
+| `SUPABASE_URL` | *(required)* | Supabase Auth project URL for JWT verification |
+| `SUPABASE_PUBLISHABLE_KEY` | *(required)* | Supabase publishable key for Auth verification |
 | `AI_PROVIDER` | `none`                                             | AI Model Adapter implementation (stub)   |
 | `AI_API_KEY`  | *(empty)*                                          | Reserved for a future AI provider        |
 
@@ -48,7 +50,7 @@ If MongoDB is unreachable at startup the skeleton logs an error and keeps runnin
 
 ```bash
 docker build -t rolefit-job-posting-service .
-docker run --rm -p 3002:3002 -p 50052:50052 \
+docker run --rm -p 3002:3002 -p 50052:50052 --env-file .env \
   -e MONGODB_URI=mongodb://host.docker.internal:27017/rolefit_job_posting \
   rolefit-job-posting-service
 ```
@@ -88,7 +90,8 @@ Defined in [proto/job-posting.proto](proto/job-posting.proto) (package `rolefit.
 | `PublishJob`, `CloseJob`, `ReopenJob` | DRAFT → OPEN → CLOSED → OPEN |
 | `AttachResumeTemplate`, `GetResumeTemplate`, `DeleteResumeTemplate` | One PDF/DOCX template per job, up to 2 MB |
 
-- **Identity (mock auth):** writes need metadata `x-user-id` and `x-company-id`. The caller's company must own the job.
+- **Authentication:** every Job Posting RPC needs gRPC metadata `authorization: Bearer <access-token>`. Supabase verifies the token with `auth.getClaims`; `sub`, `app_metadata.role`, and `app_metadata.company_id` are read from signed claims. Legacy identity headers are ignored.
+- **Authorization:** all mutations require `app_metadata.role = recruiter` and a non-empty `app_metadata.company_id`. The claimed company must own the job. Assign `company_id` through Supabase Admin; user-editable `user_metadata` is not used. Reads also require a valid token, and DRAFT jobs are visible only to recruiters from their owning company.
 - **Visibility:** a DRAFT job is only returned to its own company.
 - **Errors:** `INVALID_ARGUMENT` (with trailing metadata `x-validation-errors`, a JSON array of `{ field, message }`), `NOT_FOUND`, `FAILED_PRECONDITION` (illegal lifecycle step), `UNAUTHENTICATED`, `PERMISSION_DENIED`.
 

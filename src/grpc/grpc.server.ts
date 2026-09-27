@@ -3,6 +3,7 @@ import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import type { JobService } from '../services/job.service';
 import { createJobPostingHandlers } from './job-posting.grpc';
+import type { ClaimsVerifier } from '../auth/supabase';
 
 // Resolves correctly from both src/grpc (tsx) and dist/grpc (compiled).
 const PROTO_PATH = path.resolve(__dirname, '../../proto/job-posting.proto');
@@ -24,9 +25,10 @@ export function startGrpcServer(
   jobService: JobService,
   host: string,
   port: number,
+  verifyClaims: ClaimsVerifier,
 ): Promise<{ server: grpc.Server; port: number }> {
   const server = new grpc.Server();
-  server.addService(loadJobPostingServiceDefinition(), createJobPostingHandlers(jobService));
+  server.addService(loadJobPostingServiceDefinition(), createJobPostingHandlers(jobService, verifyClaims));
 
   // Insecure credentials: fine for local development. Use TLS / mTLS between services in production.
   return new Promise((resolve, reject) => {

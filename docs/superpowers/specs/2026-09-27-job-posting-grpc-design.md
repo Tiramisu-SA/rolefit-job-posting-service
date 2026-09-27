@@ -104,12 +104,12 @@ A separate collection, `resume_templates`:
 
 ## Identity
 
-- Callers send gRPC metadata `x-user-id` and `x-company-id`. `src/grpc/identity.ts` reads them into `Caller = { userId, companyId } | null`.
+- Every RPC requires gRPC metadata `authorization: Bearer <access-token>`. Supabase `auth.getClaims` verifies the token; `Caller` is derived from signed `sub`, `app_metadata.role`, and `app_metadata.company_id` claims. Legacy identity headers are ignored.
 - **Writes** (create, update, delete, publish, close, reopen, attach or delete template):
-  - A `null` caller gets `UNAUTHENTICATED`.
+  - A missing or invalid token gets `UNAUTHENTICATED`.
+  - The caller must have the `recruiter` role and a company assignment.
   - A job with `companyId !== caller.companyId` gets `PERMISSION_DENIED`.
-- **Reads** also work without a caller (Job Discovery, seekers). See [Visibility](#visibility).
-- The metadata is trusted only because auth is mocked. When real auth arrives, only `identity.ts` changes.
+- Reads require a valid token; open and closed jobs are visible to authenticated callers. See [Visibility](#visibility).
 
 ## Lifecycle
 
@@ -156,7 +156,7 @@ Validation lives in `src/validation/job.validation.ts`, as pure functions.
 
 ### Visibility
 
-A rule applied to each job: **a DRAFT job is visible only to its owner** (`caller.companyId === job.companyId`). OPEN and CLOSED jobs are visible to everyone.
+A rule applied to each job: **a DRAFT job is visible only to a recruiter from its owning company** (`caller.role === 'recruiter' && caller.companyId === job.companyId`). OPEN and CLOSED jobs are visible to authenticated callers.
 
 - `GetJob` on a DRAFT the caller doesn't own returns `NOT_FOUND`, so its existence isn't revealed.
 - `ListJobs` leaves out DRAFT jobs the caller doesn't own.

@@ -4,6 +4,7 @@ import { AppError, ValidationError, type ErrorCode } from '../utils/errors';
 import { logger } from '../utils/logger';
 import { callerFrom } from './identity';
 import { fromProtoJobInput, fromProtoStatus, toProtoJob, toProtoTemplate } from './job.mapper';
+import type { ClaimsVerifier } from '../auth/supabase';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Msg = Record<string, any>;
@@ -37,10 +38,13 @@ function toGrpcError(err: unknown): Partial<grpc.ServiceError> {
 }
 
 /** Wraps a handler: reads identity, runs it, maps the result or error. */
-function unary(run: (request: Msg, caller: ReturnType<typeof callerFrom>) => Promise<Msg>): grpc.handleUnaryCall<Msg, Msg> {
+type Handler = (request: Msg, caller: Awaited<ReturnType<typeof callerFrom>>) => Promise<Msg>;
+
+function unary(run: Handler, verifyClaims: ClaimsVerifier): grpc.handleUnaryCall<Msg, Msg> {
   return async (call, callback) => {
     try {
-      callback(null, await run(call.request, callerFrom(call.metadata)));
+      const caller = await callerFrom(call.metadata, verifyClaims);
+      callback(null, await run(call.request, caller));
     } catch (err) {
       callback(toGrpcError(err));
     }
@@ -51,23 +55,24 @@ function unary(run: (request: Msg, caller: ReturnType<typeof callerFrom>) => Pro
  * gRPC handlers for JobPostingService: a thin transport layer on top of
  * JobService (identity, mapping, errors). No business rules here.
  */
-export function createJobPostingHandlers(jobService: JobService): grpc.UntypedServiceImplementation {
+export function createJobPostingHandlers(jobService: JobService, verifyClaims: ClaimsVerifier): grpc.UntypedServiceImplementation {
   const job = async (p: Promise<Parameters<typeof toProtoJob>[0]>) => ({ job: toProtoJob(await p) });
+  const authed = (run: Handler) => unary(run, verifyClaims);
 
   return {
-    CreateJob: unary((req, caller) => job(jobService.createJob(caller, fromProtoJobInput(req.job)))),
-    GetJob: unary((req, caller) => job(jobService.getJob(caller, req.job_id))),
-    UpdateJob: unary((req, caller) => job(jobService.updateJob(caller, req.job_id, fromProtoJobInput(req.job)))),
-    PublishJob: unary((req, caller) => job(jobService.publishJob(caller, req.job_id))),
-    CloseJob: unary((req, caller) => job(jobService.closeJob(caller, req.job_id))),
-    ReopenJob: unary((req, caller) => job(jobService.reopenJob(caller, req.job_id))),
+    CreateJob: authed((req, caller) => job(jobService.createJob(caller, fromProtoJobInput(req.job)))),
+    GetJob: authed((req, caller) => job(jobService.getJob(caller, req.job_id))),
+    UpdateJob: authed((req, caller) => job(jobService.updateJob(caller, req.job_id, fromProtoJobInput(req.job)))),
+    PublishJob: authed((req, caller) => job(jobService.publishJob(caller, req.job_id))),
+    CloseJob: authed((req, caller) => job(jobService.closeJob(caller, req.job_id))),
+    ReopenJob: authed((req, caller) => job(jobService.reopenJob(caller, req.job_id))),
 
-    DeleteJob: unary(async (req, caller) => {
+    DeleteJob: authed(async (req, caller) => {
       await jobService.deleteJob(caller, req.job_id);
       return {};
     }),
 
-    ListJobs: unary(async (req, caller) => {
+    ListJobs: authed(async (req, caller) => {
       const result = await jobService.listJobs(caller, {
         status: fromProtoStatus(req.status),
         companyId: req.company_id || undefined,
@@ -78,7 +83,7 @@ export function createJobPostingHandlers(jobService: JobService): grpc.UntypedSe
       return { jobs: result.items.map(toProtoJob), total: result.total, page: result.page, limit: result.limit };
     }),
 
-    AttachResumeTemplate: unary(async (req, caller) => {
+    AttachResumeTemplate: authed(async (req, caller) => {
       const template = await jobService.attachResumeTemplate(caller, req.job_id, {
         fileName: req.file_name ?? '',
         contentType: req.content_type ?? '',
@@ -87,11 +92,11 @@ export function createJobPostingHandlers(jobService: JobService): grpc.UntypedSe
       return { template: toProtoTemplate(template) };
     }),
 
-    GetResumeTemplate: unary(async (req, caller) => ({
+    GetResumeTemplate: authed(async (req, caller) => ({
       template: toProtoTemplate(await jobService.getResumeTemplate(caller, req.job_id, Boolean(req.include_content))),
     })),
 
-    DeleteResumeTemplate: unary(async (req, caller) => {
+    DeleteResumeTemplate: authed(async (req, caller) => {
       await jobService.deleteResumeTemplate(caller, req.job_id);
       return {};
     }),

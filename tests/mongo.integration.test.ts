@@ -9,7 +9,7 @@ import type { Caller } from '../src/types/job.types';
 // Runs only against a real MongoDB (the database is dropped first):
 //   MONGODB_TEST_URI=mongodb://localhost:27017/rolefit_job_posting_test npm test
 const uri = process.env.MONGODB_TEST_URI;
-const ACME: Caller = { userId: 'user_a', companyId: 'co-acme' };
+const ACME: Caller = { userId: 'user_a', role: 'recruiter', companyId: 'co-acme' };
 
 test('MongoJobRepository: CRUD, lifecycle, list and templates', { skip: !uri && 'MONGODB_TEST_URI not set' }, async () => {
   await mongoose.connect(uri!, { serverSelectionTimeoutMS: 5000 });

@@ -8,10 +8,14 @@ import { JobService } from '../src/services/job.service';
 import { StubAIModelAdapter } from '../src/adapters/ai/ai.adapter';
 import { InMemoryJobRepository } from './fakes/in-memory-job.repository';
 
-type Call = (method: string, request: object, identity?: { userId: string; companyId: string }) => Promise<any>;
+type TestIdentity = { userId: string; role?: string; companyId?: string };
+type Call = (method: string, request: object, identity?: TestIdentity | null, headers?: Record<string, string>) => Promise<any>;
 
-const ACME = { userId: 'user_a', companyId: 'co-acme' };
-const OTHER = { userId: 'user_b', companyId: 'co-other' };
+const ACME = { userId: 'user_a', role: 'recruiter', companyId: 'co-acme' };
+const OTHER = { userId: 'user_b', role: 'recruiter', companyId: 'co-other' };
+const SEEKER = { userId: 'user_seeker', role: 'seeker' };
+const SEEKER_WITH_COMPANY = { userId: 'user_seeker_company', role: 'seeker', companyId: 'co-acme' };
+const RECRUITER_WITHOUT_COMPANY = { userId: 'user_no_company', role: 'recruiter' };
 
 const COMPLETE_INPUT = {
   title: 'Backend Engineer',
@@ -27,7 +31,10 @@ const COMPLETE_INPUT = {
 
 async function withClient(fn: (call: Call) => Promise<void>) {
   const service = new JobService(new InMemoryJobRepository(), new StubAIModelAdapter());
-  const { server, port } = await startGrpcServer(service, '127.0.0.1', 0);
+  const tokens = new Map<string, { sub: string; app_metadata: Record<string, string> }>();
+  let nextToken = 0;
+  const verifyClaims = async (token: string) => tokens.get(token) ?? null;
+  const { server, port } = await startGrpcServer(service, '127.0.0.1', 0, verifyClaims);
   const def = protoLoader.loadSync(path.resolve(__dirname, '../proto/job-posting.proto'), {
     keepCase: true,
     longs: String,
@@ -37,13 +44,21 @@ async function withClient(fn: (call: Call) => Promise<void>) {
   });
   const pkg = grpc.loadPackageDefinition(def) as any;
   const client = new pkg.rolefit.jobposting.v1.JobPostingService(`127.0.0.1:${port}`, grpc.credentials.createInsecure());
-  const call: Call = (method, request, identity) =>
+  const call: Call = (method, request, identity, extraHeaders) =>
     new Promise((resolve, reject) => {
       const metadata = new grpc.Metadata();
       if (identity) {
-        metadata.set('x-user-id', identity.userId);
-        metadata.set('x-company-id', identity.companyId);
+        const token = `test-token-${++nextToken}`;
+        tokens.set(token, {
+          sub: identity.userId,
+          app_metadata: {
+            ...(identity.role ? { role: identity.role } : {}),
+            ...(identity.companyId ? { company_id: identity.companyId } : {}),
+          },
+        });
+        metadata.set('authorization', `Bearer ${token}`);
       }
+      for (const [key, value] of Object.entries(extraHeaders ?? {})) metadata.set(key, value);
       client[method](request, metadata, (err: grpc.ServiceError | null, res: unknown) => (err ? reject(err) : resolve(res)));
     });
   try {
@@ -56,9 +71,11 @@ async function withClient(fn: (call: Call) => Promise<void>) {
 
 const hasCode = (code: grpc.status) => (err: grpc.ServiceError) => err.code === code;
 
-test('CreateJob needs identity metadata', async () => {
+test('all RPCs require a valid bearer token', async () => {
   await withClient(async (call) => {
     await assert.rejects(call('CreateJob', { job: { title: 'T' } }), hasCode(grpc.status.UNAUTHENTICATED));
+    await assert.rejects(call('GetJob', { job_id: 'job_missing' }, null, { authorization: 'invalid' }), hasCode(grpc.status.UNAUTHENTICATED));
+    await assert.rejects(call('ListJobs', {}, null, { authorization: 'Bearer expired-token' }), hasCode(grpc.status.UNAUTHENTICATED));
   });
 });
 
@@ -73,6 +90,24 @@ test('CreateJob validation errors are INVALID_ARGUMENT with x-validation-errors'
   });
 });
 
+test('writes require recruiter role and a signed company assignment', async () => {
+  await withClient(async (call) => {
+    await assert.rejects(call('CreateJob', { job: COMPLETE_INPUT }, SEEKER), hasCode(grpc.status.PERMISSION_DENIED));
+    await assert.rejects(call('CreateJob', { job: COMPLETE_INPUT }, RECRUITER_WITHOUT_COMPANY), hasCode(grpc.status.PERMISSION_DENIED));
+  });
+});
+
+test('identity headers cannot override signed recruiter claims', async () => {
+  await withClient(async (call) => {
+    const { job } = await call('CreateJob', { job: COMPLETE_INPUT }, ACME, {
+      'x-user-id': 'spoofed-user',
+      'x-company-id': 'spoofed-company',
+    });
+    assert.equal(job.recruiter_id, ACME.userId);
+    assert.equal(job.company_id, ACME.companyId);
+  });
+});
+
 test('full lifecycle over gRPC with visibility and ownership', async () => {
   await withClient(async (call) => {
     const { job } = await call('CreateJob', { job: COMPLETE_INPUT }, ACME);
@@ -83,18 +118,18 @@ test('full lifecycle over gRPC with visibility and ownership', async () => {
     assert.equal(job.salary.maximum, undefined);
     assert.equal(job.application_settings.positions_available, 2);
 
-    await assert.rejects(call('GetJob', { job_id: job.id }), hasCode(grpc.status.NOT_FOUND));
+    await assert.rejects(call('GetJob', { job_id: job.id }, OTHER), hasCode(grpc.status.NOT_FOUND));
     await assert.rejects(call('UpdateJob', { job_id: job.id, job: COMPLETE_INPUT }, OTHER), hasCode(grpc.status.NOT_FOUND));
 
     const published = await call('PublishJob', { job_id: job.id }, ACME);
     assert.equal(published.job.status, 'JOB_STATUS_OPEN');
     assert.notEqual(published.job.published_at, '');
 
-    const read = await call('GetJob', { job_id: job.id });
+    const read = await call('GetJob', { job_id: job.id }, SEEKER);
     assert.equal(read.job.requirements.required_skills[0].level, 'SKILL_LEVEL_INTERMEDIATE');
     assert.equal(read.job.location.district, 'Pathum Wan');
 
-    const list = await call('ListJobs', { query: 'python' });
+    const list = await call('ListJobs', { query: 'python' }, SEEKER);
     assert.equal(list.total, 1);
     assert.equal(list.page, 1);
     assert.equal(list.limit, 20);
@@ -113,6 +148,8 @@ test('ListJobs filters by status and company; drafts only for the owner', async 
     assert.equal(mine.total, 1);
     const theirs = await call('ListJobs', { company_id: 'co-acme' }, OTHER);
     assert.equal(theirs.total, 0);
+    const seeker = await call('ListJobs', { company_id: 'co-acme', status: 'JOB_STATUS_DRAFT' }, SEEKER_WITH_COMPANY);
+    assert.equal(seeker.total, 0);
   });
 });
 

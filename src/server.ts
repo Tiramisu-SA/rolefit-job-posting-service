@@ -4,8 +4,11 @@ import { env } from './config/env';
 import { jobService } from './container';
 import { startGrpcServer } from './grpc/grpc.server';
 import { logger } from './utils/logger';
+import { createClaimsVerifier } from './auth/supabase';
 
 async function main(): Promise<void> {
+  const verifyClaims = createClaimsVerifier(env.supabaseUrl, env.supabasePublishableKey);
+
   try {
     await connectDatabase();
   } catch (err) {
@@ -19,7 +22,7 @@ async function main(): Promise<void> {
     logger.info(`REST API listening on http://localhost:${env.httpPort}`);
   });
 
-  const { server: grpcServer, port: grpcPort } = await startGrpcServer(jobService, env.grpcHost, env.grpcPort);
+  const { server: grpcServer, port: grpcPort } = await startGrpcServer(jobService, env.grpcHost, env.grpcPort, verifyClaims);
   logger.info(`gRPC server listening on ${env.grpcHost}:${grpcPort}`);
 
   const shutdown = async (signal: string) => {

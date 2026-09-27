@@ -109,11 +109,10 @@ Suggested order: 1 → 2 → 3 → 4 → 5, then the rest in parallel.
 
 ## E. Cross-cutting
 
-### TODO 17 – Authentication and authorization (later)
-- File: `src/middleware/auth.middleware.ts` (currently lets everything through).
-- Decide how identity arrives (API gateway header, JWT, ...).
-- Only recruiters/owners may create, update, publish, close, reopen, or attach templates.
-- Secure the internal gRPC port (network isolation, and mTLS/TLS in `grpc.server.ts`).
+### TODO 17 – Authentication and authorization (partially implemented)
+- Job RPCs verify Supabase bearer tokens with `auth.getClaims`; caller identity comes from signed `sub` and `app_metadata` claims.
+- Mutations require the recruiter role and a company assignment, then retain the existing company ownership checks.
+- Remaining: secure the internal gRPC port with network isolation and mTLS/TLS in `grpc.server.ts`.
 
 ### TODO 18 – Configuration and startup ✅ Done
 - Validate env vars in `src/config/env.ts` (fail fast in production).
