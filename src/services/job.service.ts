@@ -31,10 +31,7 @@ export class JobService {
     return this.jobRepository.create(input);
   }
 
-  async updateJob(
-    jobId: string,
-    input: UpdateJobInput,
-  ): Promise<Job> {
+  async updateJob(jobId: string, input: UpdateJobInput): Promise<Job> {
     // TODO: Load job, throw NotFoundError if missing, enforce which fields may change
     //       in the current status, persist changes.
     const job = await this.jobRepository.update(jobId, input);
@@ -45,7 +42,6 @@ export class JobService {
 
     return job;
   }
-
 
   async publishJob(_jobId: string): Promise<Job> {
     // TODO: Enforce publishing rules (allowed source states, required fields present).
@@ -75,7 +71,6 @@ export class JobService {
     return job;
   }
 
-
   async deleteJob(jobId: string): Promise<void> {
     const deleted = await this.jobRepository.delete(jobId);
 
@@ -84,14 +79,15 @@ export class JobService {
     }
   }
 
-  async listJobs(
-    query: ListJobsQuery,
-  ): Promise<PaginatedResult<Job>> {
+  async listJobs(query: ListJobsQuery): Promise<PaginatedResult<Job>> {
     // TODO: Validate/normalize filters and pagination, delegate to repository.
     return this.jobRepository.list(query);
   }
 
-  async attachResumeTemplate(_jobId: string, _input: AttachResumeTemplateInput): Promise<ResumeTemplate> {
+  async attachResumeTemplate(
+    _jobId: string,
+    _input: AttachResumeTemplateInput,
+  ): Promise<ResumeTemplate> {
     // TODO: Ensure the job exists, validate the template, persist it.
     throw new NotImplementedError('JobService.attachResumeTemplate');
   }

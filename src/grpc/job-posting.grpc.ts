@@ -71,7 +71,7 @@ export function createJobPostingHandlers(
     ) => {
       try {
         const job = await jobService.getJob(call.request.job_id);
-                // TODO: Map the domain Job to the proto Job message (status enum, timestamps, ...).
+        // TODO: Map the domain Job to the proto Job message (status enum, timestamps, ...).
         // TODO: Decide whether DRAFT jobs should be visible to Job Discovery Service.
 
         callback(null, {
@@ -147,14 +147,11 @@ export function createJobPostingHandlers(
       try {
         console.log('[gRPC] UpdateJob called');
 
-        const job = await jobService.updateJob(
-          call.request.job_id,
-          {
-            title: call.request.title,
-            description: call.request.description,
-            requirements: call.request.requirements,
-          },
-        );
+        const job = await jobService.updateJob(call.request.job_id, {
+          title: call.request.title,
+          description: call.request.description,
+          requirements: call.request.requirements,
+        });
 
         callback(null, {
           job,

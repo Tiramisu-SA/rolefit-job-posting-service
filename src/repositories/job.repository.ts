@@ -128,9 +128,7 @@ export class JobRepository {
     throw new NotImplementedError('JobRepository.saveResumeTemplate');
   }
 
-  async findResumeTemplate(
-    _jobId: string,
-  ): Promise<ResumeTemplate | null> {
+  async findResumeTemplate(_jobId: string): Promise<ResumeTemplate | null> {
     // TODO: Load the resume template for a job.
     throw new NotImplementedError('JobRepository.findResumeTemplate');
   }

@@ -35,11 +35,8 @@ export class JobController {
   //   const job = await this.jobService.createJob(req.body);
   //   res.status(201).json(job);
   // };
-  
-  updateJob = async (
-    req: Request<{ jobId: string }>,
-    res: Response,
-  ) => {
+
+  updateJob = async (req: Request<{ jobId: string }>, res: Response) => {
     jobPostingGrpcClient.UpdateJob(
       {
         job_id: req.params.jobId,
@@ -83,10 +80,7 @@ export class JobController {
     res.json(job);
   };
 
-  deleteJob = async (
-    req: Request<{ jobId: string }>,
-    res: Response,
-  ) => {
+  deleteJob = async (req: Request<{ jobId: string }>, res: Response) => {
     jobPostingGrpcClient.DeleteJob(
       {
         job_id: req.params.jobId,
@@ -126,12 +120,21 @@ export class JobController {
   //   res.json(result);
   // };
 
-  attachResumeTemplate = async (req: Request<{ jobId: string }>, res: Response) => {
-    const template = await this.jobService.attachResumeTemplate(req.params.jobId, req.body);
+  attachResumeTemplate = async (
+    req: Request<{ jobId: string }>,
+    res: Response,
+  ) => {
+    const template = await this.jobService.attachResumeTemplate(
+      req.params.jobId,
+      req.body,
+    );
     res.status(201).json(template);
   };
 
-  getResumeTemplate = async (req: Request<{ jobId: string }>, res: Response) => {
+  getResumeTemplate = async (
+    req: Request<{ jobId: string }>,
+    res: Response,
+  ) => {
     const template = await this.jobService.getResumeTemplate(req.params.jobId);
     res.json(template);
   };

@@ -22,24 +22,24 @@ cp .env.example .env   # then adjust values
 
 ## Commands
 
-| Command             | Description                                       |
-| ------------------- | ------------------------------------------------- |
-| `npm run dev`       | Start in watch mode with `tsx` (REST + gRPC)      |
-| `npm run build`     | Compile TypeScript to `dist/`                     |
-| `npm start`         | Run the compiled service (`dist/server.js`)       |
-| `npm run typecheck` | Type-check without emitting                       |
-| `npm test`          | Run tests in `tests/` (Node test runner via tsx)  |
+| Command             | Description                                      |
+| ------------------- | ------------------------------------------------ |
+| `npm run dev`       | Start in watch mode with `tsx` (REST + gRPC)     |
+| `npm run build`     | Compile TypeScript to `dist/`                    |
+| `npm start`         | Run the compiled service (`dist/server.js`)      |
+| `npm run typecheck` | Type-check without emitting                      |
+| `npm test`          | Run tests in `tests/` (Node test runner via tsx) |
 
 ## Ports & environment variables
 
-| Variable      | Default                                            | Purpose                                  |
-| ------------- | -------------------------------------------------- | ---------------------------------------- |
-| `HTTP_PORT`   | `3000`                                             | Public REST API port                     |
-| `GRPC_HOST`   | `0.0.0.0`                                          | gRPC bind address                        |
-| `GRPC_PORT`   | `50051`                                            | Internal gRPC API port                   |
-| `MONGODB_URI` | `mongodb://localhost:27017/rolefit_job_posting`    | MongoDB connection string                |
-| `AI_PROVIDER` | `none`                                             | AI Model Adapter implementation (stub)   |
-| `AI_API_KEY`  | *(empty)*                                          | Reserved for a future AI provider        |
+| Variable      | Default                                         | Purpose                                |
+| ------------- | ----------------------------------------------- | -------------------------------------- |
+| `HTTP_PORT`   | `3000`                                          | Public REST API port                   |
+| `GRPC_HOST`   | `0.0.0.0`                                       | gRPC bind address                      |
+| `GRPC_PORT`   | `50051`                                         | Internal gRPC API port                 |
+| `MONGODB_URI` | `mongodb://localhost:27017/rolefit_job_posting` | MongoDB connection string              |
+| `AI_PROVIDER` | `none`                                          | AI Model Adapter implementation (stub) |
+| `AI_API_KEY`  | _(empty)_                                       | Reserved for a future AI provider      |
 
 If MongoDB is unreachable at startup the skeleton logs an error and keeps running, so REST/gRPC can still be smoke-tested. `GET /health` reports the DB state.
 
@@ -78,18 +78,18 @@ Web frontend                         Job Discovery Service
 
 ## REST API
 
-| Method | Path                                | Operation              |
-| ------ | ----------------------------------- | ---------------------- |
-| GET    | `/health`                           | Health check           |
-| POST   | `/api/jobs`                         | `createJob`            |
-| GET    | `/api/jobs`                         | `listJobs`             |
-| GET    | `/api/jobs/:jobId`                  | `getJob`               |
-| PUT    | `/api/jobs/:jobId`                  | `updateJob`            |
-| POST   | `/api/jobs/:jobId/publish`          | `publishJob`           |
-| POST   | `/api/jobs/:jobId/close`            | `closeJob`             |
-| POST   | `/api/jobs/:jobId/reopen`           | `reopenJob`            |
-| POST   | `/api/jobs/:jobId/resume-template`  | `attachResumeTemplate` |
-| GET    | `/api/jobs/:jobId/resume-template`  | `getResumeTemplate`    |
+| Method | Path                               | Operation              |
+| ------ | ---------------------------------- | ---------------------- |
+| GET    | `/health`                          | Health check           |
+| POST   | `/api/jobs`                        | `createJob`            |
+| GET    | `/api/jobs`                        | `listJobs`             |
+| GET    | `/api/jobs/:jobId`                 | `getJob`               |
+| PUT    | `/api/jobs/:jobId`                 | `updateJob`            |
+| POST   | `/api/jobs/:jobId/publish`         | `publishJob`           |
+| POST   | `/api/jobs/:jobId/close`           | `closeJob`             |
+| POST   | `/api/jobs/:jobId/reopen`          | `reopenJob`            |
+| POST   | `/api/jobs/:jobId/resume-template` | `attachResumeTemplate` |
+| GET    | `/api/jobs/:jobId/resume-template` | `getResumeTemplate`    |
 
 Lifecycle changes use explicit action endpoints instead of a writable `status` field, so `JobService` controls the state rules.
 

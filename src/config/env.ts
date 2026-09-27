@@ -14,7 +14,8 @@ export const env = {
   httpPort: toPort(process.env.HTTP_PORT, 3000),
   grpcHost: process.env.GRPC_HOST ?? '0.0.0.0',
   grpcPort: toPort(process.env.GRPC_PORT, 50051),
-  mongodbUri: process.env.MONGODB_URI ?? 'mongodb://localhost:27017/rolefit_job_posting',
+  mongodbUri:
+    process.env.MONGODB_URI ?? 'mongodb://localhost:27017/rolefit_job_posting',
   aiProvider: process.env.AI_PROVIDER ?? 'none',
   aiApiKey: process.env.AI_API_KEY ?? '',
 } as const;
