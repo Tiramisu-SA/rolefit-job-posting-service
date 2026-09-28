@@ -13,7 +13,8 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "tsx --test tests/*.test.ts"
+    "test": "tsx --test tests/*.test.ts",
+    "seed": "tsx src/scripts/seed.ts"
   },
   "engines": {
     "node": ">=20"
@@ -24,7 +25,8 @@
     "@grpc/proto-loader": "^0.8.1",
     "dotenv": "^18.0.3",
     "express": "^5.2.1",
-    "mongoose": "^9.10.2"
+    "mongoose": "^9.10.2",
+    "ulid": "^3.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

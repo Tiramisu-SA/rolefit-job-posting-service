@@ -1,15 +1,13 @@
 import express, { type Express } from 'express';
 import { isDatabaseConnected } from './config/database';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware';
-import { createJobRouter } from './routes/job.routes';
-import type { JobService } from './services/job.service';
 
-export function createApp(jobService: JobService): Express {
+/**
+ * HTTP server for health checks only. The job API is gRPC
+ * (proto/job-posting.proto); the web frontend calls it from its Next.js server.
+ */
+export function createApp(): Express {
   const app = express();
-
-  app.use(express.json());
-  // TODO: Add CORS configuration for the web frontend origin.
-  // TODO: Add request logging.
 
   app.get('/health', (_req, res) => {
     res.json({
@@ -18,8 +16,6 @@ export function createApp(jobService: JobService): Express {
       database: isDatabaseConnected() ? 'connected' : 'disconnected',
     });
   });
-
-  app.use('/api/jobs', createJobRouter(jobService));
 
   app.use(notFoundHandler);
   app.use(errorHandler);

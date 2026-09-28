@@ -1,36 +1,12 @@
 import * as grpc from '@grpc/grpc-js';
 import type { JobService } from '../services/job.service';
-import { AppError, type ErrorCode } from '../utils/errors';
+import { AppError, ValidationError, type ErrorCode } from '../utils/errors';
 import { logger } from '../utils/logger';
+import { callerFrom } from './identity';
+import { fromProtoJobInput, fromProtoStatus, toProtoJob, toProtoTemplate } from './job.mapper';
 
-// Plain TS shapes of the proto messages (proto-loader uses keepCase: true, so snake_case).
-// TODO: Optionally generate these types with `proto-loader-gen-types` instead of hand-writing them.
-interface GetJobRequest {
-  job_id: string;
-}
-
-interface ListJobsRequest {
-  status: number;
-  page: number;
-  limit: number;
-}
-
-interface CreateJobRequest {
-  title: string;
-  description: string;
-  requirements: string;
-}
-
-interface UpdateJobRequest {
-  job_id: string;
-  title: string;
-  description: string;
-  requirements: string;
-}
-
-interface DeleteJobRequest {
-  job_id: string;
-}
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type Msg = Record<string, any>;
 
 const GRPC_STATUS: Record<ErrorCode, grpc.status> = {
   NOT_IMPLEMENTED: grpc.status.UNIMPLEMENTED,
@@ -41,141 +17,83 @@ const GRPC_STATUS: Record<ErrorCode, grpc.status> = {
   FORBIDDEN: grpc.status.PERMISSION_DENIED,
 };
 
+/**
+ * ASCII metadata values may only hold printable ASCII, so non-ASCII characters
+ * (e.g. Thai skill names in messages) are written as \uXXXX JSON escapes.
+ * JSON.parse on the client restores them.
+ */
+function asciiJson(value: unknown): string {
+  return JSON.stringify(value).replace(/[^\x20-\x7e]/g, (ch) => `\\u${ch.charCodeAt(0).toString(16).padStart(4, '0')}`);
+}
+
 function toGrpcError(err: unknown): Partial<grpc.ServiceError> {
   if (err instanceof AppError) {
-    return {
-      code: GRPC_STATUS[err.code],
-      details: err.message,
-    };
+    const metadata = new grpc.Metadata();
+    if (err instanceof ValidationError) metadata.set('x-validation-errors', asciiJson(err.details));
+    return { code: GRPC_STATUS[err.code], details: err.message, metadata };
   }
-
   logger.error('Unhandled gRPC error', err);
+  return { code: grpc.status.INTERNAL, details: 'Internal server error' };
+}
 
-  return {
-    code: grpc.status.INTERNAL,
-    details: 'Internal server error',
+/** Wraps a handler: reads identity, runs it, maps the result or error. */
+function unary(run: (request: Msg, caller: ReturnType<typeof callerFrom>) => Promise<Msg>): grpc.handleUnaryCall<Msg, Msg> {
+  return async (call, callback) => {
+    try {
+      callback(null, await run(call.request, callerFrom(call.metadata)));
+    } catch (err) {
+      callback(toGrpcError(err));
+    }
   };
 }
 
 /**
- * gRPC handlers for JobPostingService. Like the REST controller, these are a thin
- * transport layer on top of the SAME JobService - no business logic here.
+ * gRPC handlers for JobPostingService: a thin transport layer on top of
+ * JobService (identity, mapping, errors). No business rules here.
  */
-export function createJobPostingHandlers(
-  jobService: JobService,
-): grpc.UntypedServiceImplementation {
+export function createJobPostingHandlers(jobService: JobService): grpc.UntypedServiceImplementation {
+  const job = async (p: Promise<Parameters<typeof toProtoJob>[0]>) => ({ job: toProtoJob(await p) });
+
   return {
-    GetJob: async (
-      call: grpc.ServerUnaryCall<GetJobRequest, unknown>,
-      callback: grpc.sendUnaryData<unknown>,
-    ) => {
-      try {
-        const job = await jobService.getJob(call.request.job_id);
-        // TODO: Map the domain Job to the proto Job message (status enum, timestamps, ...).
-        // TODO: Decide whether DRAFT jobs should be visible to Job Discovery Service.
+    CreateJob: unary((req, caller) => job(jobService.createJob(caller, fromProtoJobInput(req.job)))),
+    GetJob: unary((req, caller) => job(jobService.getJob(caller, req.job_id))),
+    UpdateJob: unary((req, caller) => job(jobService.updateJob(caller, req.job_id, fromProtoJobInput(req.job)))),
+    PublishJob: unary((req, caller) => job(jobService.publishJob(caller, req.job_id))),
+    CloseJob: unary((req, caller) => job(jobService.closeJob(caller, req.job_id))),
+    ReopenJob: unary((req, caller) => job(jobService.reopenJob(caller, req.job_id))),
 
-        callback(null, {
-          job,
-        });
-      } catch (err) {
-        callback(toGrpcError(err));
-      }
-    },
+    DeleteJob: unary(async (req, caller) => {
+      await jobService.deleteJob(caller, req.job_id);
+      return {};
+    }),
 
-    ListJobs: async (
-      call: grpc.ServerUnaryCall<ListJobsRequest, unknown>,
-      callback: grpc.sendUnaryData<unknown>,
-    ) => {
-      try {
-        // TODO: Map proto request (enum status, zero-valued page/limit) to ListJobsQuery.
-        console.log('[gRPC] ListJobs called');
+    ListJobs: unary(async (req, caller) => {
+      const result = await jobService.listJobs(caller, {
+        status: fromProtoStatus(req.status),
+        companyId: req.company_id || undefined,
+        query: req.query || undefined,
+        page: req.page || undefined,
+        limit: req.limit || undefined,
+      });
+      return { jobs: result.items.map(toProtoJob), total: result.total, page: result.page, limit: result.limit };
+    }),
 
-        const query: any = {
-          page: call.request.page || 1,
-          limit: call.request.limit || 10,
-        };
+    AttachResumeTemplate: unary(async (req, caller) => {
+      const template = await jobService.attachResumeTemplate(caller, req.job_id, {
+        fileName: req.file_name ?? '',
+        contentType: req.content_type ?? '',
+        content: Buffer.from(req.content ?? []),
+      });
+      return { template: toProtoTemplate(template) };
+    }),
 
-        // 0 = JOB_STATUS_UNSPECIFIED
-        if (call.request.status && call.request.status !== 0) {
-          const statusMap: Record<number, string> = {
-            1: 'DRAFT',
-            2: 'PUBLISHED',
-            3: 'CLOSED',
-          };
+    GetResumeTemplate: unary(async (req, caller) => ({
+      template: toProtoTemplate(await jobService.getResumeTemplate(caller, req.job_id, Boolean(req.include_content))),
+    })),
 
-          query.status = statusMap[call.request.status];
-        }
-
-        const result = await jobService.listJobs(query);
-
-        callback(null, {
-          jobs: result.items,
-          total: result.total,
-          page: result.page,
-          limit: result.limit,
-        });
-      } catch (err) {
-        callback(toGrpcError(err));
-      }
-    },
-
-    CreateJob: async (
-      call: grpc.ServerUnaryCall<CreateJobRequest, unknown>,
-      callback: grpc.sendUnaryData<unknown>,
-    ) => {
-      try {
-        console.log('[gRPC] CreateJob called');
-
-        const job = await jobService.createJob({
-          title: call.request.title,
-          description: call.request.description,
-          requirements: call.request.requirements,
-        });
-
-        callback(null, {
-          job,
-        });
-      } catch (err) {
-        callback(toGrpcError(err));
-      }
-    },
-
-    UpdateJob: async (
-      call: grpc.ServerUnaryCall<UpdateJobRequest, unknown>,
-      callback: grpc.sendUnaryData<unknown>,
-    ) => {
-      try {
-        console.log('[gRPC] UpdateJob called');
-
-        const job = await jobService.updateJob(call.request.job_id, {
-          title: call.request.title,
-          description: call.request.description,
-          requirements: call.request.requirements,
-        });
-
-        callback(null, {
-          job,
-        });
-      } catch (err) {
-        callback(toGrpcError(err));
-      }
-    },
-
-    DeleteJob: async (
-      call: grpc.ServerUnaryCall<DeleteJobRequest, unknown>,
-      callback: grpc.sendUnaryData<unknown>,
-    ) => {
-      try {
-        console.log('[gRPC] DeleteJob called');
-
-        await jobService.deleteJob(call.request.job_id);
-
-        callback(null, {
-          success: true,
-        });
-      } catch (err) {
-        callback(toGrpcError(err));
-      }
-    },
+    DeleteResumeTemplate: unary(async (req, caller) => {
+      await jobService.deleteResumeTemplate(caller, req.job_id);
+      return {};
+    }),
   };
 }

@@ -1,0 +1,921 @@
+[
+  {
+    "_id": "job_seed_frontend",
+    "recruiterId": "user_4a80fdb2",
+    "companyId": "co-brightline",
+    "title": "Frontend Developer",
+    "description": "You'll build the dashboards our clients use to explore their data. You'll work with designers and backend engineers to ship accessible, fast interfaces in React and TypeScript, and help shape our component library.",
+    "requirements": {
+      "requiredSkills": [
+        {
+          "name": "React",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "TypeScript",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "Tailwind CSS",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "REST APIs",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "Git",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "GraphQL",
+          "level": "BASIC",
+          "minimumYears": 0
+        }
+      ],
+      "preferredSkills": [
+        {
+          "name": "Data visualization (D3, Recharts)",
+          "level": "BASIC"
+        },
+        {
+          "name": "Testing with Jest or Vitest",
+          "level": "BASIC"
+        },
+        {
+          "name": "Accessibility (WCAG)",
+          "level": "BASIC"
+        }
+      ],
+      "minimumExperienceYears": 1,
+      "educationLevel": "BACHELOR",
+      "acceptedFields": [
+        "Computer Science",
+        "Computer Engineering",
+        "Software Engineering"
+      ]
+    },
+    "responsibilities": [
+      "Build and maintain customer-facing dashboard features",
+      "Turn Figma designs into reusable, accessible components",
+      "Write unit and integration tests for UI logic",
+      "Take part in code reviews and sprint planning"
+    ],
+    "employmentType": "FULL_TIME",
+    "workArrangement": "HYBRID",
+    "location": {
+      "country": "Thailand",
+      "province": "Bangkok"
+    },
+    "salary": {
+      "minimum": 45000,
+      "maximum": 65000,
+      "currency": "THB",
+      "visible": true
+    },
+    "applicationSettings": {
+      "applicationDeadline": "2026-10-15T00:00:00.000Z",
+      "positionsAvailable": 1,
+      "resumeTemplateId": "template_seed_frontend",
+      "resumeTemplateName": "Brightline standard resume",
+      "requireCoverLetter": false
+    },
+    "status": "OPEN",
+    "publishedAt": "2026-09-22T09:00:00.000Z",
+    "createdAt": "2026-09-22T09:00:00.000Z",
+    "updatedAt": "2026-09-22T09:00:00.000Z"
+  },
+  {
+    "_id": "job_seed_backend",
+    "recruiterId": "user_4a80fdb2",
+    "companyId": "co-brightline",
+    "title": "Backend Engineer (Node.js)",
+    "description": "Own the services that power our analytics platform. You'll design APIs, model data in PostgreSQL, and help the team move to a more resilient event-driven architecture.",
+    "requirements": {
+      "requiredSkills": [
+        {
+          "name": "Node.js",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "TypeScript",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "PostgreSQL",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "REST APIs",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "Docker",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "AWS",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        }
+      ],
+      "preferredSkills": [
+        {
+          "name": "Event-driven architecture",
+          "level": "BASIC"
+        },
+        {
+          "name": "Kubernetes",
+          "level": "BASIC"
+        },
+        {
+          "name": "GraphQL",
+          "level": "BASIC"
+        }
+      ],
+      "minimumExperienceYears": 3,
+      "educationLevel": "NONE",
+      "acceptedFields": []
+    },
+    "responsibilities": [
+      "Design and build REST APIs consumed by our dashboard and mobile apps",
+      "Model and optimize PostgreSQL schemas for reporting workloads",
+      "Improve deployment pipelines and service observability",
+      "Mentor junior engineers on backend patterns"
+    ],
+    "employmentType": "FULL_TIME",
+    "workArrangement": "HYBRID",
+    "location": {
+      "country": "Thailand",
+      "province": "Bangkok"
+    },
+    "salary": {
+      "minimum": 55000,
+      "maximum": 75000,
+      "currency": "THB",
+      "visible": true
+    },
+    "applicationSettings": {
+      "applicationDeadline": "2026-10-20T00:00:00.000Z",
+      "positionsAvailable": 1,
+      "resumeTemplateId": "template_seed_backend",
+      "resumeTemplateName": "Brightline standard resume",
+      "requireCoverLetter": false
+    },
+    "status": "OPEN",
+    "publishedAt": "2026-09-10T09:00:00.000Z",
+    "createdAt": "2026-09-10T09:00:00.000Z",
+    "updatedAt": "2026-09-10T09:00:00.000Z"
+  },
+  {
+    "_id": "job_seed_data_analyst",
+    "recruiterId": "user_4a80fdb2",
+    "companyId": "co-brightline",
+    "title": "Data Analyst",
+    "description": "Turn raw client data into the reports and dashboards our account teams rely on. You'll write SQL against large datasets and present findings directly to stakeholders.",
+    "requirements": {
+      "requiredSkills": [
+        {
+          "name": "SQL",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "Excel",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "Python",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "Data visualization",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "Tableau",
+          "level": "BASIC",
+          "minimumYears": 0
+        }
+      ],
+      "preferredSkills": [
+        {
+          "name": "Experience with Tableau or Power BI",
+          "level": "BASIC"
+        },
+        {
+          "name": "Basic statistics",
+          "level": "BASIC"
+        }
+      ],
+      "minimumExperienceYears": 1,
+      "educationLevel": "BACHELOR",
+      "acceptedFields": [
+        "Computer Science",
+        "Computer Engineering",
+        "Software Engineering"
+      ]
+    },
+    "responsibilities": [
+      "Write and optimize SQL queries against client data warehouses",
+      "Build recurring reports and ad-hoc analyses for account teams",
+      "Maintain dashboards in our internal BI tool",
+      "Document data definitions and quality checks"
+    ],
+    "employmentType": "FULL_TIME",
+    "workArrangement": "ONSITE",
+    "location": {
+      "country": "Thailand",
+      "province": "Bangkok"
+    },
+    "salary": {
+      "minimum": 40000,
+      "maximum": 55000,
+      "currency": "THB",
+      "visible": true
+    },
+    "applicationSettings": {
+      "applicationDeadline": "2026-09-30T00:00:00.000Z",
+      "positionsAvailable": 1,
+      "requireCoverLetter": false
+    },
+    "status": "OPEN",
+    "publishedAt": "2026-08-28T09:00:00.000Z",
+    "createdAt": "2026-08-28T09:00:00.000Z",
+    "updatedAt": "2026-08-28T09:00:00.000Z"
+  },
+  {
+    "_id": "job_seed_ux_designer",
+    "recruiterId": "user_4a80fdb2",
+    "companyId": "co-brightline",
+    "title": "UX Designer",
+    "description": "Shape the end-to-end experience of our analytics product, from early research to polished, testable prototypes. You'll partner closely with product and engineering.",
+    "requirements": {
+      "requiredSkills": [
+        {
+          "name": "Figma",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "UI design",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "Prototyping",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "User research",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "Design systems",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        }
+      ],
+      "preferredSkills": [
+        {
+          "name": "B2B SaaS experience",
+          "level": "BASIC"
+        },
+        {
+          "name": "Experience running usability tests",
+          "level": "BASIC"
+        }
+      ],
+      "minimumExperienceYears": 3,
+      "educationLevel": "NONE",
+      "acceptedFields": []
+    },
+    "responsibilities": [
+      "Run discovery interviews and usability studies with customers",
+      "Design flows and high-fidelity prototypes in Figma",
+      "Maintain and extend our design system",
+      "Partner with engineers during implementation"
+    ],
+    "employmentType": "FULL_TIME",
+    "workArrangement": "REMOTE",
+    "location": {
+      "country": "Thailand",
+      "province": "Bangkok"
+    },
+    "salary": {
+      "minimum": 45000,
+      "maximum": 60000,
+      "currency": "THB",
+      "visible": true
+    },
+    "applicationSettings": {
+      "applicationDeadline": "2026-10-12T00:00:00.000Z",
+      "positionsAvailable": 1,
+      "requireCoverLetter": false
+    },
+    "status": "OPEN",
+    "publishedAt": "2026-09-05T09:00:00.000Z",
+    "createdAt": "2026-09-05T09:00:00.000Z",
+    "updatedAt": "2026-09-05T09:00:00.000Z"
+  },
+  {
+    "_id": "job_seed_qa_intern",
+    "recruiterId": "user_4a80fdb2",
+    "companyId": "co-brightline",
+    "title": "QA Engineer Intern",
+    "description": "A hands-on internship for someone who wants to learn software quality from the ground up. You'll write test cases, file bugs, and help us tighten our release process.",
+    "requirements": {
+      "requiredSkills": [
+        {
+          "name": "Manual testing",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "Test cases",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "Bug tracking",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "Communication",
+          "level": "BASIC",
+          "minimumYears": 0
+        }
+      ],
+      "preferredSkills": [
+        {
+          "name": "Familiarity with a bug tracker (Jira, Linear)",
+          "level": "BASIC"
+        },
+        {
+          "name": "Basic scripting",
+          "level": "BASIC"
+        }
+      ],
+      "minimumExperienceYears": 0,
+      "educationLevel": "NONE",
+      "acceptedFields": []
+    },
+    "responsibilities": [
+      "Write and execute manual test cases against new features",
+      "File clear, reproducible bug reports",
+      "Help maintain our test case library",
+      "Shadow engineers during release testing"
+    ],
+    "employmentType": "INTERNSHIP",
+    "workArrangement": "ONSITE",
+    "location": {
+      "country": "Thailand",
+      "province": "Bangkok"
+    },
+    "salary": {
+      "minimum": 15000,
+      "currency": "THB",
+      "visible": true
+    },
+    "applicationSettings": {
+      "positionsAvailable": 1,
+      "requireCoverLetter": false
+    },
+    "status": "DRAFT",
+    "createdAt": "2026-09-18T09:00:00.000Z",
+    "updatedAt": "2026-09-18T09:00:00.000Z"
+  },
+  {
+    "_id": "job_seed_devops",
+    "recruiterId": "user_4a80fdb2",
+    "companyId": "co-brightline",
+    "title": "DevOps Engineer",
+    "description": "Own the infrastructure and delivery pipeline for our platform. You'll harden our Kubernetes clusters, tighten CI/CD, and reduce toil for the rest of engineering.",
+    "requirements": {
+      "requiredSkills": [
+        {
+          "name": "Docker",
+          "level": "ADVANCED",
+          "minimumYears": 0
+        },
+        {
+          "name": "Kubernetes",
+          "level": "ADVANCED",
+          "minimumYears": 0
+        },
+        {
+          "name": "CI/CD",
+          "level": "ADVANCED",
+          "minimumYears": 0
+        },
+        {
+          "name": "AWS",
+          "level": "ADVANCED",
+          "minimumYears": 0
+        },
+        {
+          "name": "Terraform",
+          "level": "ADVANCED",
+          "minimumYears": 0
+        }
+      ],
+      "preferredSkills": [
+        {
+          "name": "Observability tooling (Grafana, Prometheus)",
+          "level": "BASIC"
+        },
+        {
+          "name": "Cost optimization experience",
+          "level": "BASIC"
+        }
+      ],
+      "minimumExperienceYears": 5,
+      "educationLevel": "NONE",
+      "acceptedFields": []
+    },
+    "responsibilities": [
+      "Operate and improve our Kubernetes-based infrastructure",
+      "Build and maintain CI/CD pipelines",
+      "Own infrastructure-as-code with Terraform",
+      "Lead incident response and postmortems"
+    ],
+    "employmentType": "FULL_TIME",
+    "workArrangement": "HYBRID",
+    "location": {
+      "country": "Thailand",
+      "province": "Bangkok"
+    },
+    "salary": {
+      "minimum": 70000,
+      "maximum": 95000,
+      "currency": "THB",
+      "visible": true
+    },
+    "applicationSettings": {
+      "applicationDeadline": "2026-09-01T00:00:00.000Z",
+      "positionsAvailable": 1,
+      "resumeTemplateId": "template_seed_devops",
+      "resumeTemplateName": "Brightline standard resume",
+      "requireCoverLetter": false
+    },
+    "status": "CLOSED",
+    "publishedAt": "2026-07-20T09:00:00.000Z",
+    "createdAt": "2026-07-20T09:00:00.000Z",
+    "updatedAt": "2026-07-20T09:00:00.000Z"
+  },
+  {
+    "_id": "job_seed_harbor_junior",
+    "recruiterId": "user_seed_harbor",
+    "companyId": "co-harbor",
+    "title": "Junior Web Engineer",
+    "description": "Join Harbor's consumer web team to build the account and payments screens our customers use every day. This is a great first role for a developer who wants to grow fast.",
+    "requirements": {
+      "requiredSkills": [
+        {
+          "name": "JavaScript",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "React",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "REST APIs",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "Jest",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "GraphQL",
+          "level": "BASIC",
+          "minimumYears": 0
+        }
+      ],
+      "preferredSkills": [
+        {
+          "name": "Fintech or payments experience",
+          "level": "BASIC"
+        },
+        {
+          "name": "GraphQL",
+          "level": "BASIC"
+        }
+      ],
+      "minimumExperienceYears": 1,
+      "educationLevel": "NONE",
+      "acceptedFields": []
+    },
+    "responsibilities": [
+      "Build and ship features across our customer-facing web app",
+      "Write tests alongside every feature you ship",
+      "Work directly with product and design on new flows",
+      "Take part in an on-call rotation with senior support"
+    ],
+    "employmentType": "FULL_TIME",
+    "workArrangement": "ONSITE",
+    "location": {
+      "country": "Thailand",
+      "province": "Bangkok"
+    },
+    "salary": {
+      "minimum": 38000,
+      "maximum": 50000,
+      "currency": "THB",
+      "visible": true
+    },
+    "applicationSettings": {
+      "applicationDeadline": "2026-10-08T00:00:00.000Z",
+      "positionsAvailable": 1,
+      "requireCoverLetter": false
+    },
+    "status": "OPEN",
+    "publishedAt": "2026-08-25T09:00:00.000Z",
+    "createdAt": "2026-08-25T09:00:00.000Z",
+    "updatedAt": "2026-08-25T09:00:00.000Z"
+  },
+  {
+    "_id": "job_seed_cobalt_intern",
+    "recruiterId": "user_seed_cobalt",
+    "companyId": "co-cobalt",
+    "title": "UI Engineer Intern",
+    "description": "Cobalt Studio builds interfaces for design-forward startups. As a UI engineer intern you'll turn Figma files into production components under the guidance of senior engineers.",
+    "requirements": {
+      "requiredSkills": [
+        {
+          "name": "Figma",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "CSS",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "React",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "Storybook",
+          "level": "BASIC",
+          "minimumYears": 0
+        }
+      ],
+      "preferredSkills": [
+        {
+          "name": "Motion and micro-interaction design",
+          "level": "BASIC"
+        },
+        {
+          "name": "Accessibility basics",
+          "level": "BASIC"
+        }
+      ],
+      "minimumExperienceYears": 0,
+      "educationLevel": "NONE",
+      "acceptedFields": []
+    },
+    "responsibilities": [
+      "Implement UI components from Figma designs",
+      "Maintain our internal Storybook component library",
+      "Pair with senior engineers on client projects",
+      "Join weekly design critique sessions"
+    ],
+    "employmentType": "INTERNSHIP",
+    "workArrangement": "REMOTE",
+    "location": {
+      "country": "Thailand",
+      "province": "Bangkok"
+    },
+    "salary": {
+      "minimum": 18000,
+      "currency": "THB",
+      "visible": true
+    },
+    "applicationSettings": {
+      "applicationDeadline": "2026-10-25T00:00:00.000Z",
+      "positionsAvailable": 1,
+      "requireCoverLetter": false
+    },
+    "status": "OPEN",
+    "publishedAt": "2026-08-20T09:00:00.000Z",
+    "createdAt": "2026-08-20T09:00:00.000Z",
+    "updatedAt": "2026-08-20T09:00:00.000Z"
+  },
+  {
+    "_id": "job_seed_meridian_fullstack",
+    "recruiterId": "user_seed_meridian",
+    "companyId": "co-meridian",
+    "title": "Full-stack Developer",
+    "description": "Meridian Health builds scheduling and records software for clinics across Thailand. You'll work across the stack, from PostgreSQL schemas to the React screens clinic staff use daily.",
+    "requirements": {
+      "requiredSkills": [
+        {
+          "name": "Node.js",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "PostgreSQL",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "React",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "Docker",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "AWS",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        }
+      ],
+      "preferredSkills": [
+        {
+          "name": "Healthcare or regulated-industry experience",
+          "level": "BASIC"
+        },
+        {
+          "name": "AWS",
+          "level": "BASIC"
+        }
+      ],
+      "minimumExperienceYears": 3,
+      "educationLevel": "NONE",
+      "acceptedFields": []
+    },
+    "responsibilities": [
+      "Build features spanning our Node.js APIs and React frontend",
+      "Design PostgreSQL schemas for patient and scheduling data",
+      "Containerize and deploy services with Docker",
+      "Take part in on-call and incident reviews"
+    ],
+    "employmentType": "FULL_TIME",
+    "workArrangement": "HYBRID",
+    "location": {
+      "country": "Thailand",
+      "province": "Chiang Mai"
+    },
+    "salary": {
+      "minimum": 50000,
+      "maximum": 70000,
+      "currency": "THB",
+      "visible": true
+    },
+    "applicationSettings": {
+      "applicationDeadline": "2026-10-18T00:00:00.000Z",
+      "positionsAvailable": 1,
+      "requireCoverLetter": false
+    },
+    "status": "OPEN",
+    "publishedAt": "2026-09-17T09:00:00.000Z",
+    "createdAt": "2026-09-17T09:00:00.000Z",
+    "updatedAt": "2026-09-17T09:00:00.000Z"
+  },
+  {
+    "_id": "job_seed_atlas_platform",
+    "recruiterId": "user_seed_atlas",
+    "companyId": "co-atlas",
+    "title": "Software Engineer, Platform",
+    "description": "Atlas Logistics moves freight across Southeast Asia, and our platform team builds the services that route and track it. You'll work in Go against a fleet of gRPC services running on Kubernetes.",
+    "requirements": {
+      "requiredSkills": [
+        {
+          "name": "TypeScript",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "Go",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "Kubernetes",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "gRPC",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        }
+      ],
+      "preferredSkills": [
+        {
+          "name": "Logistics or supply chain experience",
+          "level": "BASIC"
+        },
+        {
+          "name": "Distributed systems experience",
+          "level": "BASIC"
+        }
+      ],
+      "minimumExperienceYears": 3,
+      "educationLevel": "NONE",
+      "acceptedFields": []
+    },
+    "responsibilities": [
+      "Build and operate gRPC services that power routing and tracking",
+      "Improve the reliability of our Kubernetes-based platform",
+      "Write clear technical designs for cross-team review",
+      "Participate in an on-call rotation"
+    ],
+    "employmentType": "FULL_TIME",
+    "workArrangement": "HYBRID",
+    "location": {
+      "country": "Thailand",
+      "province": "Bangkok"
+    },
+    "salary": {
+      "minimum": 60000,
+      "maximum": 85000,
+      "currency": "THB",
+      "visible": true
+    },
+    "applicationSettings": {
+      "applicationDeadline": "2026-10-22T00:00:00.000Z",
+      "positionsAvailable": 1,
+      "requireCoverLetter": false
+    },
+    "status": "OPEN",
+    "publishedAt": "2026-08-05T09:00:00.000Z",
+    "createdAt": "2026-08-05T09:00:00.000Z",
+    "updatedAt": "2026-08-05T09:00:00.000Z"
+  },
+  {
+    "_id": "job_seed_pinecrest_mobile",
+    "recruiterId": "user_seed_pinecrest",
+    "companyId": "co-pinecrest",
+    "title": "Mobile Developer (React Native)",
+    "description": "Pinecrest Software is a contract shop building mobile apps for clients across the region. This engagement is a 6-month React Native build for a retail client, with the option to extend.",
+    "requirements": {
+      "requiredSkills": [
+        {
+          "name": "React",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "React Native",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "iOS",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        },
+        {
+          "name": "Swift",
+          "level": "INTERMEDIATE",
+          "minimumYears": 0
+        }
+      ],
+      "preferredSkills": [
+        {
+          "name": "Android/Kotlin experience",
+          "level": "BASIC"
+        },
+        {
+          "name": "Experience working on fixed-term contracts",
+          "level": "BASIC"
+        }
+      ],
+      "minimumExperienceYears": 3,
+      "educationLevel": "NONE",
+      "acceptedFields": []
+    },
+    "responsibilities": [
+      "Build and ship features in a cross-platform React Native app",
+      "Integrate native iOS modules where React Native falls short",
+      "Work directly with the client's product owner",
+      "Write tests for critical app flows"
+    ],
+    "employmentType": "CONTRACT",
+    "workArrangement": "REMOTE",
+    "location": {
+      "country": "Thailand",
+      "province": "Bangkok"
+    },
+    "salary": {
+      "minimum": 55000,
+      "currency": "THB",
+      "visible": true
+    },
+    "applicationSettings": {
+      "applicationDeadline": "2026-10-10T00:00:00.000Z",
+      "positionsAvailable": 1,
+      "requireCoverLetter": false
+    },
+    "status": "OPEN",
+    "publishedAt": "2026-09-20T09:00:00.000Z",
+    "createdAt": "2026-09-20T09:00:00.000Z",
+    "updatedAt": "2026-09-20T09:00:00.000Z"
+  },
+  {
+    "_id": "job_seed_lotus_web",
+    "recruiterId": "user_seed_lotus",
+    "companyId": "co-lotus",
+    "title": "Web Developer",
+    "description": "Lotus Retail Group is growing its e-commerce team. You'll build storefront features used by shoppers across Thailand, working closely with merchandising and marketing.",
+    "requirements": {
+      "requiredSkills": [
+        {
+          "name": "JavaScript",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "CSS",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "React",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "REST APIs",
+          "level": "BASIC",
+          "minimumYears": 0
+        },
+        {
+          "name": "Redux",
+          "level": "BASIC",
+          "minimumYears": 0
+        }
+      ],
+      "preferredSkills": [
+        {
+          "name": "E-commerce platform experience",
+          "level": "BASIC"
+        },
+        {
+          "name": "Performance optimization",
+          "level": "BASIC"
+        }
+      ],
+      "minimumExperienceYears": 1,
+      "educationLevel": "NONE",
+      "acceptedFields": []
+    },
+    "responsibilities": [
+      "Build storefront features in our React-based e-commerce site",
+      "Integrate REST APIs for catalog, cart, and checkout",
+      "Fix bugs reported by the merchandising and support teams",
+      "Help improve page performance ahead of sale events"
+    ],
+    "employmentType": "FULL_TIME",
+    "workArrangement": "ONSITE",
+    "location": {
+      "country": "Thailand",
+      "province": "Bangkok"
+    },
+    "salary": {
+      "minimum": 35000,
+      "maximum": 48000,
+      "currency": "THB",
+      "visible": true
+    },
+    "applicationSettings": {
+      "applicationDeadline": "2026-10-05T00:00:00.000Z",
+      "positionsAvailable": 1,
+      "requireCoverLetter": false
+    },
+    "status": "OPEN",
+    "publishedAt": "2026-08-10T09:00:00.000Z",
+    "createdAt": "2026-08-10T09:00:00.000Z",
+    "updatedAt": "2026-08-10T09:00:00.000Z"
+  }
+]

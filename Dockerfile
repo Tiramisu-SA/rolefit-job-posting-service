@@ -17,8 +17,8 @@ COPY --from=build /app/dist ./dist
 # The .proto file is loaded at runtime by @grpc/proto-loader
 COPY proto ./proto
 
-# REST, gRPC
-EXPOSE 3000 50051
+# HTTP (/health), gRPC
+EXPOSE 3002 50052
 
 USER node
 CMD ["node", "dist/server.js"]
