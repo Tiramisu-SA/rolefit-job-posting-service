@@ -89,8 +89,8 @@ export interface JobInput {
   requireCoverLetter: boolean;
 }
 
-/** Who is calling (from gRPC metadata). null = anonymous reader, e.g. Job Discovery. */
-export type Caller = { userId: string; companyId: string } | null;
+/** Verified caller claims. Reads accept any authenticated role; writes require recruiter + company. */
+export type Caller = { userId: string; role?: string; companyId?: string } | null;
 
 export interface ListJobsQuery {
   status?: JobStatus;

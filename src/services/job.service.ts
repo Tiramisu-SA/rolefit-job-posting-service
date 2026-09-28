@@ -70,7 +70,8 @@ export class JobService {
       page,
       limit,
     };
-    const { items, total } = await this.repo.list(normalized, { draftsVisibleTo: caller?.companyId });
+    const draftsVisibleTo = caller?.role === 'recruiter' ? caller.companyId : undefined;
+    const { items, total } = await this.repo.list(normalized, { draftsVisibleTo });
     return { items, total, page, limit };
   }
 
@@ -209,13 +210,18 @@ export class JobService {
   }
 }
 
-function requireCaller(caller: Caller): NonNullable<Caller> {
+type RecruiterCaller = { userId: string; role: 'recruiter'; companyId: string };
+
+function requireCaller(caller: Caller): RecruiterCaller {
   if (!caller) throw new UnauthorizedError();
-  return caller;
+  if (caller.role !== 'recruiter' || !caller.companyId) {
+    throw new ForbiddenError('Recruiter role and company assignment are required');
+  }
+  return { userId: caller.userId, role: 'recruiter', companyId: caller.companyId };
 }
 
 function isVisible(job: Job, caller: Caller): boolean {
-  return job.status !== 'DRAFT' || job.companyId === caller?.companyId;
+  return job.status !== 'DRAFT' || (caller?.role === 'recruiter' && job.companyId === caller.companyId);
 }
 
 function assertStatus(job: Job, expected: JobStatus, message: string): void {

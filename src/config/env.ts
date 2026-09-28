@@ -16,6 +16,8 @@ export const env = {
   grpcHost: process.env.GRPC_HOST ?? '0.0.0.0',
   grpcPort: toPort(process.env.GRPC_PORT, 50052),
   mongodbUri: process.env.MONGODB_URI ?? 'mongodb://localhost:27017/rolefit_job_posting',
+  supabaseUrl: process.env.SUPABASE_URL ?? '',
+  supabasePublishableKey: process.env.SUPABASE_PUBLISHABLE_KEY ?? '',
   aiProvider: process.env.AI_PROVIDER ?? 'none',
   aiApiKey: process.env.AI_API_KEY ?? '',
 } as const;

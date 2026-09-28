@@ -6,8 +6,8 @@ import { StubAIModelAdapter } from '../src/adapters/ai/ai.adapter';
 import { AppError, type ErrorCode } from '../src/utils/errors';
 import type { Caller } from '../src/types/job.types';
 
-const ACME: Caller = { userId: 'user_a', companyId: 'co-acme' };
-const OTHER: Caller = { userId: 'user_b', companyId: 'co-other' };
+const ACME: Caller = { userId: 'user_a', role: 'recruiter', companyId: 'co-acme' };
+const OTHER: Caller = { userId: 'user_b', role: 'recruiter', companyId: 'co-other' };
 
 const COMPLETE = {
   title: 'Backend Engineer',
