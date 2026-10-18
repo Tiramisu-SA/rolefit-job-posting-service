@@ -35,7 +35,7 @@ npm run seed           # optional: 12 sample jobs (company co-brightline = dev r
 
 | Variable      | Default                                            | Purpose                                  |
 | ------------- | -------------------------------------------------- | ---------------------------------------- |
-| `HTTP_PORT`   | `3002`                                             | Health check port (`/health`)            |
+| `HTTP_PORT`   | `3003`                                             | Health check port (`/health`)            |
 | `GRPC_HOST`   | `0.0.0.0`                                          | gRPC bind address                        |
 | `GRPC_PORT`   | `50052`                                            | gRPC API port                            |
 | `MONGODB_URI` | `mongodb://localhost:27017/rolefit_job_posting`    | MongoDB connection string                |
@@ -48,7 +48,7 @@ If MongoDB is unreachable at startup the skeleton logs an error and keeps runnin
 
 ```bash
 docker build -t rolefit-job-posting-service .
-docker run --rm -p 3002:3002 -p 50052:50052 \
+docker run --rm -p 3003:3003 -p 50052:50052 \
   -e MONGODB_URI=mongodb://host.docker.internal:27017/rolefit_job_posting \
   rolefit-job-posting-service
 ```

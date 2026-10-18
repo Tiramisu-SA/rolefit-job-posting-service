@@ -296,7 +296,7 @@ In the proto, enum values are prefixed (`EMPLOYMENT_TYPE_FULL_TIME`). The domain
 | `src/grpc/job-posting.grpc.ts` | All 11 handlers. Thin: read identity, map, call the service, map back |
 | `src/container.ts` | Wires `MongoJobRepository` |
 | `src/app.ts` | Only `/health`. REST job routes, controller and auth middleware are deleted |
-| `src/config/env.ts` | Defaults `HTTP_PORT=3002`, `GRPC_PORT=50052` |
+| `src/config/env.ts` | Defaults `HTTP_PORT=3003`, `GRPC_PORT=50052` |
 | `src/scripts/seed.ts` + `npm run seed` | Upserts about 10 sample jobs with fixed IDs (`job_seed_<slug>`). Taken from the frontend's current mock jobs; the frontend's mock applications refer to these IDs |
 | `Dockerfile`, `README.md`, `TODO.md`, `.env.example` | Ports, API docs, finished TODOs |
 
@@ -325,7 +325,7 @@ Everything uses the built-in Node test runner (`npm test`), with no new test dep
 
 | Variable | Default | Change |
 |---|---|---|
-| `HTTP_PORT` | `3002` | default was 3000 |
+| `HTTP_PORT` | `3003` | default was 3000 (3002 is the Job Discovery Service) |
 | `GRPC_HOST` | `0.0.0.0` | — |
 | `GRPC_PORT` | `50052` | default was 50051 |
 | `MONGODB_URI` | `mongodb://localhost:27017/rolefit_job_posting` | — |
