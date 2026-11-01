@@ -18,7 +18,7 @@ COPY --from=build /app/dist ./dist
 COPY proto ./proto
 
 # HTTP (/health), gRPC
-EXPOSE 3002 50052
+EXPOSE 3003 50052
 
 USER node
 CMD ["node", "dist/server.js"]
