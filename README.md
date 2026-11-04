@@ -94,6 +94,10 @@ Defined in [proto/job-posting.proto](proto/job-posting.proto) (package `rolefit.
 
 The proto is loaded at runtime with `@grpc/proto-loader` (`keepCase`, `enums: String`). Clients should use a copy of this same file.
 
+## Logs and request id
+
+Logs are JSON, one object per line. Each RPC logs one line when it ends, with `requestId`, `rpc`, `grpcStatus` and `durationMs`. The id comes from the caller's `x-request-id` metadata, or is generated if missing or unsafe.
+
 ## Folder structure
 
 ```
