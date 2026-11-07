@@ -4,6 +4,7 @@ import { env } from './config/env';
 import { jobService } from './container';
 import { startGrpcServer } from './grpc/grpc.server';
 import { logger } from './utils/logger';
+import { redactMongoUri } from './utils/redact-uri';
 
 async function main(): Promise<void> {
   try {
@@ -11,7 +12,7 @@ async function main(): Promise<void> {
   } catch (err) {
     // The skeleton keeps running without MongoDB so REST/gRPC can be smoke-tested.
     // TODO: Decide whether the service should fail fast (exit) when MongoDB is unreachable.
-    logger.error(`Could not connect to MongoDB at ${env.mongodbUri}`, (err as Error).message);
+    logger.error(`Could not connect to MongoDB at ${redactMongoUri(env.mongodbUri)}`, (err as Error).message);
   }
 
   const app = createApp();

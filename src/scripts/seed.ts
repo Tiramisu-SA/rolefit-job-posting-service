@@ -3,6 +3,7 @@ import { env } from '../config/env';
 import { JobModel } from '../models/job.model';
 import { ResumeTemplateModel } from '../models/resume-template.model';
 import { logger } from '../utils/logger';
+import { redactMongoUri } from '../utils/redact-uri';
 import { withFutureDeadlines } from './seed-deadlines';
 import seedJobs from './seed-jobs.json';
 
@@ -36,7 +37,7 @@ async function main(): Promise<void> {
       });
     }
   }
-  logger.info(`Seeded ${seedJobs.length} jobs into ${env.mongodbUri}`);
+  logger.info(`Seeded ${seedJobs.length} jobs into ${redactMongoUri(env.mongodbUri)}`);
 }
 
 main()
