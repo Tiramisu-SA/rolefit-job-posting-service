@@ -19,15 +19,20 @@ function loadJobPostingServiceDefinition(): grpc.ServiceDefinition {
   return proto.rolefit.jobposting.v1.JobPostingService.service;
 }
 
-export function startGrpcServer(jobService: JobService, host: string, port: number): Promise<grpc.Server> {
+/** Binds and starts the gRPC server. Resolves with the server and the bound port (useful with port 0). */
+export function startGrpcServer(
+  jobService: JobService,
+  host: string,
+  port: number,
+): Promise<{ server: grpc.Server; port: number }> {
   const server = new grpc.Server();
   server.addService(loadJobPostingServiceDefinition(), createJobPostingHandlers(jobService));
 
-  // TODO: Use TLS / mTLS credentials for service-to-service calls in production.
+  // Insecure credentials: fine for local development. Use TLS / mTLS between services in production.
   return new Promise((resolve, reject) => {
-    server.bindAsync(`${host}:${port}`, grpc.ServerCredentials.createInsecure(), (err) => {
+    server.bindAsync(`${host}:${port}`, grpc.ServerCredentials.createInsecure(), (err, boundPort) => {
       if (err) return reject(err);
-      resolve(server);
+      resolve({ server, port: boundPort });
     });
   });
 }

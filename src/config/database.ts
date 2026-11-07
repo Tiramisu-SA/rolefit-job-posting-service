@@ -2,9 +2,13 @@ import mongoose from 'mongoose';
 import { env } from './env';
 import { logger } from '../utils/logger';
 
-export async function connectDatabase(uri: string = env.mongodbUri): Promise<void> {
+export async function connectDatabase(
+  uri: string = env.mongodbUri,
+): Promise<void> {
   mongoose.connection.on('connected', () => logger.info('MongoDB connected'));
-  mongoose.connection.on('disconnected', () => logger.warn('MongoDB disconnected'));
+  mongoose.connection.on('disconnected', () =>
+    logger.warn('MongoDB disconnected'),
+  );
   mongoose.connection.on('error', (err) => logger.error('MongoDB error', err));
 
   // TODO: Tune connection options (pool size, timeouts, retry policy) for deployment.

@@ -1,5 +1,13 @@
-// Domain errors shared by the REST and gRPC layers.
-// Each transport maps these to its own status codes (HTTP status / gRPC status).
+// Domain errors shared by the transport layers.
+// Each transport maps these to its own status codes (gRPC status / HTTP status).
+
+export type ErrorCode =
+  | 'NOT_IMPLEMENTED'
+  | 'NOT_FOUND'
+  | 'VALIDATION_ERROR'
+  | 'INVALID_STATE'
+  | 'UNAUTHORIZED'
+  | 'FORBIDDEN';
 
 export class AppError extends Error {
   constructor(
@@ -11,13 +19,11 @@ export class AppError extends Error {
   }
 }
 
-export type ErrorCode =
-  | 'NOT_IMPLEMENTED'
-  | 'NOT_FOUND'
-  | 'VALIDATION_ERROR'
-  | 'INVALID_STATE'
-  | 'UNAUTHORIZED'
-  | 'FORBIDDEN';
+export interface FieldError {
+  /** Path of the invalid field, e.g. `requirements.requiredSkills[1].name`. */
+  field: string;
+  message: string;
+}
 
 export class NotImplementedError extends AppError {
   constructor(operation: string) {
@@ -32,7 +38,10 @@ export class NotFoundError extends AppError {
 }
 
 export class ValidationError extends AppError {
-  constructor(message: string) {
+  constructor(
+    public readonly details: FieldError[],
+    message = details.map((d) => `${d.field}: ${d.message}`).join('; ') || 'Some fields are invalid',
+  ) {
     super(message, 'VALIDATION_ERROR');
   }
 }
@@ -41,5 +50,19 @@ export class ValidationError extends AppError {
 export class InvalidStateError extends AppError {
   constructor(message: string) {
     super(message, 'INVALID_STATE');
+  }
+}
+
+/** No caller identity on a write. */
+export class UnauthorizedError extends AppError {
+  constructor(message = 'Sign in as a recruiter to do this') {
+    super(message, 'UNAUTHORIZED');
+  }
+}
+
+/** The caller's company does not own the job. */
+export class ForbiddenError extends AppError {
+  constructor(message = 'This job belongs to another company') {
+    super(message, 'FORBIDDEN');
   }
 }
