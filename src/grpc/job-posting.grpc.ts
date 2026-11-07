@@ -4,6 +4,7 @@ import { AppError, ValidationError, type ErrorCode } from '../utils/errors';
 import { logger } from '../utils/logger';
 import { callerFrom } from './identity';
 import { fromProtoJobInput, fromProtoStatus, toProtoJob, toProtoTemplate } from './job.mapper';
+import { withRequestContext } from './with-request-context';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Msg = Record<string, any>;
@@ -54,7 +55,7 @@ function unary(run: (request: Msg, caller: ReturnType<typeof callerFrom>) => Pro
 export function createJobPostingHandlers(jobService: JobService): grpc.UntypedServiceImplementation {
   const job = async (p: Promise<Parameters<typeof toProtoJob>[0]>) => ({ job: toProtoJob(await p) });
 
-  return {
+  const handlers: Record<string, grpc.handleUnaryCall<Msg, Msg>> = {
     CreateJob: unary((req, caller) => job(jobService.createJob(caller, fromProtoJobInput(req.job)))),
     GetJob: unary((req, caller) => job(jobService.getJob(caller, req.job_id))),
     UpdateJob: unary((req, caller) => job(jobService.updateJob(caller, req.job_id, fromProtoJobInput(req.job)))),
@@ -96,4 +97,6 @@ export function createJobPostingHandlers(jobService: JobService): grpc.UntypedSe
       return {};
     }),
   };
+
+  return Object.fromEntries(Object.entries(handlers).map(([rpc, handler]) => [rpc, withRequestContext(rpc, handler)]));
 }
