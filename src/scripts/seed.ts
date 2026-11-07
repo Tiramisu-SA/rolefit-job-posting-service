@@ -3,6 +3,7 @@ import { env } from '../config/env';
 import { JobModel } from '../models/job.model';
 import { ResumeTemplateModel } from '../models/resume-template.model';
 import { logger } from '../utils/logger';
+import { withFutureDeadlines } from './seed-deadlines';
 import seedJobs from './seed-jobs.json';
 
 // Sample jobs for local development: `npm run seed`. Safe to re-run (upserts by id).
@@ -15,7 +16,7 @@ const PLACEHOLDER_PDF = Buffer.from('%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%
 
 async function main(): Promise<void> {
   await mongoose.connect(env.mongodbUri, { serverSelectionTimeoutMS: 5000 });
-  for (const seed of seedJobs) {
+  for (const seed of withFutureDeadlines(seedJobs, new Date())) {
     const { resumeTemplateName, ...applicationSettings } = seed.applicationSettings as typeof seed.applicationSettings & {
       resumeTemplateName?: string;
     };
