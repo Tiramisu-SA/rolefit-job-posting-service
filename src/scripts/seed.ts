@@ -6,14 +6,12 @@ import { logger } from '../utils/logger';
 import { redactMongoUri } from '../utils/redact-uri';
 import { withFutureDeadlines } from './seed-deadlines';
 import seedJobs from './seed-jobs.json';
+import { seedTemplateFile } from './seed-template';
 
 // Sample jobs for local development: `npm run seed`. Safe to re-run (upserts by id).
 // The data mirrors the web frontend's former mock jobs; its mock applications
 // refer to these ids (job_seed_<slug>). Brightline jobs belong to the dev
 // recruiter user_4a80fdb2 / company co-brightline.
-
-// A tiny valid PDF, standing in for the company resume templates.
-const PLACEHOLDER_PDF = Buffer.from('%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n');
 
 async function main(): Promise<void> {
   await mongoose.connect(env.mongodbUri, { serverSelectionTimeoutMS: 5000 });
@@ -29,10 +27,7 @@ async function main(): Promise<void> {
         _id: applicationSettings.resumeTemplateId,
         jobId: seed._id,
         companyId: seed.companyId,
-        fileName: `${resumeTemplateName}.pdf`,
-        contentType: 'application/pdf',
-        sizeBytes: PLACEHOLDER_PDF.length,
-        content: PLACEHOLDER_PDF,
+        ...seedTemplateFile(resumeTemplateName),
         createdAt: new Date(seed.createdAt),
       });
     }
